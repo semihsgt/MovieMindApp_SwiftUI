@@ -1,0 +1,15 @@
+{
+  "originHash" : "a9803c3cc67697e2ef2a0ad70b5a23e755bad78cae9cfe46e87841a88797db21",
+  "pins" : [
+    {
+      "identity" : "fluidheader",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Segyun/FluidHeader.git",
+      "state" : {
+        "revision" : "2bc96ebdb456b9b721f370b3d0c57c93a79ea599",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}
