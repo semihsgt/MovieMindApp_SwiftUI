@@ -35,6 +35,7 @@ struct CollectionPageView: View {
                                                 size: .w200)
                                 }
                                 .buttonStyle(.plain)
+                                .zoomSource(id: mediaRoute)
                             }
                         }
                     }

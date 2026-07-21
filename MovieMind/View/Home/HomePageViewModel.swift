@@ -43,16 +43,22 @@ final class HomePageViewModel: ObservableObject {
     @Published private(set) var popularMT: ListRespond?
     @Published private(set) var airingT: ListRespond?
     @Published private(set) var popularP: ListRespond?
-    
+
+    @Published private(set) var recommendations: [MediaItem] = []
+
     private var trendingAll: ListRespond?
-    
+    private var lastSeedSignature: String?
+
     private let networkService: NetworkServicing
     private let genreStore: GenreStore
-    
+    private let recommender: AIRecommendationService
+
     init(networkService: NetworkServicing = NetworkManager.shared,
-         genreStore: GenreStore = .shared) {
+         genreStore: GenreStore = .shared,
+         recommender: AIRecommendationService = .shared) {
         self.networkService = networkService
         self.genreStore = genreStore
+        self.recommender = recommender
     }
     
     func loadIfNeeded() async {
@@ -156,6 +162,35 @@ final class HomePageViewModel: ObservableObject {
     }
     
     
+    func loadRecommendations(seeds: [WatchlistSeed]) async {
+        guard !seeds.isEmpty else {
+            recommendations = []
+            lastSeedSignature = nil
+            return
+        }
+
+        let signature = seeds
+            .map { "\($0.mediaType.rawValue):\($0.title)" }
+            .sorted()
+            .joined(separator: "|")
+        guard signature != lastSeedSignature else { return }
+
+        do {
+            try await Task.sleep(for: .seconds(2))
+        } catch {
+            return
+        }
+
+        guard let items = try? await recommender.recommend(from: seeds), !items.isEmpty else {
+            return
+        }
+
+        lastSeedSignature = signature
+        withAnimation(.easeInOut(duration: 0.4)) {
+            recommendations = items
+        }
+    }
+
     func refetchSection(_ section: PickerSection) async {
         guard case .loaded = state else { return }
 

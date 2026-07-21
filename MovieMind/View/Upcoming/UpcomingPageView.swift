@@ -9,7 +9,8 @@ import SwiftUI
 
 struct UpcomingPageView: View {
     @StateObject private var viewModel = UpcomingPageViewModel()
-    
+    @Namespace private var zoomNamespace
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -25,11 +26,14 @@ struct UpcomingPageView: View {
             .navigationTitle("Upcoming Media")
             .navigationDestination(for: MediaRoute.self) { route in
                 DetailPageView(id: route.id, mediaType: route.mediaType)
+                    .zoomDestination(id: route, in: zoomNamespace)
             }
             .navigationDestination(for: CollectionRoute.self) { route in
                 CollectionPageView(route: route)
+                    .zoomDestination(id: route, in: zoomNamespace)
             }
         }
+        .zoomNamespace(zoomNamespace)
         .task {
             await viewModel.loadIfNeeded()
         }
@@ -42,9 +46,11 @@ struct UpcomingPageView: View {
                     .padding(.top, 40)
             } else {
                 ForEach(items) { item in
-                    NavigationLink(value: MediaRoute(id: item.id, mediaType: item.mediaType)) {
+                    let route = MediaRoute(id: item.id, mediaType: item.mediaType)
+                    NavigationLink(value: route) {
                         UpcomingCard(item: item)
                     }
+                    .zoomSource(id: route)
                 }
             }
         }

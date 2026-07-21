@@ -6,11 +6,31 @@
 //
 
 import SwiftUI
+import SwiftData
 import FluidHeader
+
+private let recommendationSeedDescriptor: FetchDescriptor<WatchlistItem> = {
+    var descriptor = FetchDescriptor<WatchlistItem>(
+        sortBy: [SortDescriptor(\.dateAdded, order: .reverse)]
+    )
+    descriptor.fetchLimit = 20
+    return descriptor
+}()
 
 struct HomePageView: View {
     @StateObject private var viewModel = HomePageViewModel()
-    
+    @Namespace private var zoomNamespace
+
+    @Query(recommendationSeedDescriptor) private var watchlist: [WatchlistItem]
+
+    private var watchlistSeeds: [WatchlistSeed] {
+        watchlist.map { WatchlistSeed(title: $0.displayName, mediaType: $0.mediaType) }
+    }
+
+    private var seedSignature: String {
+        watchlist.map(\.key).joined(separator: ",")
+    }
+
     var body: some View {
         NavigationStack {
             StateContainerView(state: viewModel.state) {
@@ -23,15 +43,24 @@ struct HomePageView: View {
             .navigationTitle("Home")
             .navigationDestination(for: MediaRoute.self) { route in
                 DetailPageView(id: route.id, mediaType: route.mediaType)
+                    .zoomDestination(id: route, in: zoomNamespace)
             }
             .navigationDestination(for: CollectionRoute.self) { route in
                 CollectionPageView(route: route)
+                    .zoomDestination(id: route, in: zoomNamespace)
+            }
+            .navigationDestination(for: AskAIRoute.self) { route in
+                AskAIView(initialQuery: route.query)
             }
             .toolbar(.hidden, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
         }
+        .zoomNamespace(zoomNamespace)
         .task {
             await viewModel.loadIfNeeded()
+        }
+        .task(id: seedSignature) {
+            await viewModel.loadRecommendations(seeds: watchlistSeeds)
         }
         .task(id: viewModel.trendingType) {
             await viewModel.refetchSection(.trending)
@@ -115,9 +144,50 @@ struct HomePageView: View {
         
     }
 
+    private var aiShortcutCard: some View {
+        NavigationLink(value: AskAIRoute(query: "")) {
+            HStack(spacing: 14) {
+                Image(systemName: "sparkles")
+                    .font(.title2)
+                    .foregroundStyle(.white)
+                    .frame(width: 50, height: 50)
+                    .background(.red.gradient, in: RoundedRectangle(cornerRadius: 14))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Ask MovieMind AI")
+                        .font(.headline)
+                        .fontDesign(.rounded)
+                        .foregroundStyle(.white)
+
+                    Text("Describe a mood or vibe and get personalized picks.")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.7))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+            .padding()
+            .background(.background.secondary, in: RoundedRectangle(cornerRadius: 20))
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal)
+        .padding(.bottom, 40)
+    }
+
     private var sections: some View {
         Group {
-            
+
+            if !viewModel.recommendations.isEmpty {
+                SectionView(title: "For You",
+                            description: "AI picks based on your watchlist.",
+                            data: viewModel.recommendations)
+            }
+
             SectionView(title: "Popular",
                         description: "What everyone is watching right now.",
                         data: viewModel.popularMT?.results,
@@ -127,11 +197,13 @@ struct HomePageView: View {
                         description: "The hottest titles today.",
                         data: viewModel.trendingMT?.results,
                         mediaType: $viewModel.trendingType)
-            
+
             SectionView(title: "Top Rated",
                         description: "Highly acclaimed movies and shows.",
                         data: viewModel.topRatedMT?.results,
                         mediaType: $viewModel.topRatedType)
+            
+            aiShortcutCard
             
             SectionView(title: "Airing Today",
                         description: "Fresh TV episodes dropping today.",
@@ -145,12 +217,14 @@ struct HomePageView: View {
                         description: "Most searched stars and creators this week.",
                         data: viewModel.popularP?.results)
         }
-        .background {
+        .background(alignment: .top) {
             LinearGradient(
                 colors: [.black.opacity(0.7), .black, .black, .black, .black, .black],
                 startPoint: .top,
                 endPoint: .bottom
             )
+            .padding(.horizontal, -30)
+            .padding(.bottom, -30)
             .blur(radius: 10)
         }
     }
@@ -158,6 +232,7 @@ struct HomePageView: View {
 
 #Preview {
     HomePageView()
+        .modelContainer(for: WatchlistItem.self, inMemory: true)
 }
 
 #Preview("Loading Skeleton") {

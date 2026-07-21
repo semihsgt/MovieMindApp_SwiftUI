@@ -56,7 +56,7 @@ struct SectionView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: 10) {
                         ForEach(data) { item in
-                            if let route = MediaRoute(item: item) {
+                            if let route = MediaRoute(item: item, sourceKey: title) {
                                 NavigationLink(value: route) {
                                     VStack {
                                         AsyncPoster(path: item.displayPath, width: 100, height: 150)
@@ -64,7 +64,7 @@ struct SectionView: View {
                                             VStack {
                                                 Text(item.displayName)
                                                     .font(.caption)
-                                                
+
                                                 Text(item.knownForDepartment ?? "")
                                                     .font(.caption2)
                                             }
@@ -73,6 +73,7 @@ struct SectionView: View {
                                         }
                                     }
                                 }
+                                .zoomSource(id: route)
                             }
                         }
                     }

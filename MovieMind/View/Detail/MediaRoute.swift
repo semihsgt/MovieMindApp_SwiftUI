@@ -10,16 +10,19 @@ import Foundation
 struct MediaRoute: Hashable {
     let id: Int
     let mediaType: MediaType
+    var sourceKey: String?
 
-    init?(item: MediaItem) {
+    init?(item: MediaItem, sourceKey: String? = nil) {
         guard let id = item.id else { return nil }
         self.id = id
         self.mediaType = item.mediaType ?? .movie
+        self.sourceKey = sourceKey
     }
 
-    init(id: Int, mediaType: MediaType) {
+    init(id: Int, mediaType: MediaType, sourceKey: String? = nil) {
         self.id = id
         self.mediaType = mediaType
+        self.sourceKey = sourceKey
     }
 }
 

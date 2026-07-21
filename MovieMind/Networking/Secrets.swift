@@ -17,4 +17,13 @@ enum Secrets {
         }
         return key
     }()
+
+    static let geminiApiKey: String? = {
+        guard let key = Bundle.main.object(forInfoDictionaryKey: "GEMINI_API_KEY") as? String,
+              !key.isEmpty,
+              key != "YOUR_GEMINI_API_KEY_HERE" else {
+            return nil
+        }
+        return key
+    }()
 }

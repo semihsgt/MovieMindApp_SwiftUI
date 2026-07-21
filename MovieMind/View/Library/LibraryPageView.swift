@@ -21,12 +21,14 @@ struct LibraryPageView: View {
     @Query(recentlyAddedDescriptor)
     private var items: [WatchlistItem]
 
+    @Namespace private var zoomNamespace
+
     private let columns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12)
     ]
-    
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -53,14 +55,17 @@ struct LibraryPageView: View {
             .navigationTitle("Library")
             .navigationDestination(for: MediaRoute.self) { route in
                 DetailPageView(id: route.id, mediaType: route.mediaType)
+                    .zoomDestination(id: route, in: zoomNamespace)
             }
             .navigationDestination(for: LibraryRoute.self) { route in
                 WatchlistListView(filter: route.filter, title: route.title)
             }
             .navigationDestination(for: CollectionRoute.self) { route in
                 CollectionPageView(route: route)
+                    .zoomDestination(id: route, in: zoomNamespace)
             }
         }
+        .zoomNamespace(zoomNamespace)
     }
     
     @ViewBuilder
@@ -75,12 +80,14 @@ struct LibraryPageView: View {
         } else {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(items) { item in
-                    NavigationLink(value: MediaRoute(id: item.mediaId, mediaType: item.mediaType)) {
+                    let route = MediaRoute(id: item.mediaId, mediaType: item.mediaType)
+                    NavigationLink(value: route) {
                         AsyncPoster(path: item.posterPath,
                                     width: nil, height: 180,
                                     size: .w500)
                     }
                     .buttonStyle(.plain)
+                    .zoomSource(id: route)
                 }
             }
             .padding(.horizontal)
@@ -120,7 +127,8 @@ struct WatchlistListView: View {
             } else {
                 List {
                     ForEach(items) { item in
-                        NavigationLink(value: MediaRoute(id: item.mediaId, mediaType: item.mediaType)) {
+                        let route = MediaRoute(id: item.mediaId, mediaType: item.mediaType)
+                        NavigationLink(value: route) {
                             HStack(spacing: 12) {
                                 AsyncPoster(path: item.posterPath,
                                             width: 50, height: 75,
@@ -135,6 +143,7 @@ struct WatchlistListView: View {
                                 }
                             }
                         }
+                        .zoomSource(id: route)
                     }
                     .onDelete(perform: delete)
                     .listSectionSeparator(.hidden)

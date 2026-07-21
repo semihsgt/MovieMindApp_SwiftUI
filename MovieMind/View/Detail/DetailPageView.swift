@@ -21,6 +21,8 @@ struct DetailPageView: View {
         } content: { item in
             detailScrollContent(for: item)
         }
+        .navigationTitle(viewModel.state.value?.result.displayName ?? "")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if let item = viewModel.state.value {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -39,9 +41,9 @@ struct DetailPageView: View {
         .task(id: "\(mediaType.rawValue)-\(id)") {
             await viewModel.loadIfNeeded(id: id, mediaType: mediaType)
         }
-
+        
     }
-
+    
     private func detailScrollContent(for item: HeroUIModel) -> some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 0) {
@@ -51,39 +53,48 @@ struct DetailPageView: View {
                 .fluidHeaderBlurOffset(220)
                 .fluidHeaderBlurHeight(40)
                 .fluidHeaderOpacityHeight(300)
-
+                
                 detailContent(for: item)
                     .padding(.top, 24)
-                    .background(Color.black)
+                    .background(alignment: .top) {
+                        LinearGradient(
+                            colors: [.black.opacity(0.7), .black, .black, .black, .black, .black],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .padding(.horizontal, -30)
+                        .padding(.bottom, -30)
+                        .blur(radius: 10)
+                    }
             }
         }
         .ignoresSafeArea(edges: .top)
     }
-
+    
     var skeletonView: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 0) {
                 heroSkeleton
-
+                
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 10) {
                         RoundedRectangle(cornerRadius: 4)
                             .fill(Color.white.opacity(0.08))
                             .frame(height: 14)
                             .shimmer()
-
+                        
                         RoundedRectangle(cornerRadius: 4)
                             .fill(Color.white.opacity(0.08))
                             .frame(height: 14)
                             .shimmer()
-
+                        
                         RoundedRectangle(cornerRadius: 4)
                             .fill(Color.white.opacity(0.08))
                             .frame(width: 180, height: 14)
                             .shimmer()
                     }
                     .padding(.horizontal)
-
+                    
                     castRowSkeleton
                 }
                 .padding(.top, 24)
@@ -93,7 +104,7 @@ struct DetailPageView: View {
         }
         .ignoresSafeArea(edges: .top)
     }
-
+    
     private var heroSkeleton: some View {
         Rectangle()
             .fill(Color.white.opacity(0.08))
@@ -102,7 +113,7 @@ struct DetailPageView: View {
             .frame(maxWidth: .infinity)
             .ignoresSafeArea(edges: .top)
     }
-
+    
     private var castRowSkeleton: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
@@ -116,7 +127,7 @@ struct DetailPageView: View {
             .padding(.horizontal)
         }
     }
-
+    
     @ViewBuilder
     private func detailContent(for hero: HeroUIModel) -> some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -127,10 +138,12 @@ struct DetailPageView: View {
                 CreditLine(label: "Director", names: directorNames(movie))
                 CastSection(cast: movie.credits?.cast)
                 if let collection = movie.belongsToCollection, let collectionId = collection.id {
-                    NavigationLink(value: CollectionRoute(id: collectionId, name: collection.name ?? "Collection")) {
+                    let collectionRoute = CollectionRoute(id: collectionId, name: collection.name ?? "Collection")
+                    NavigationLink(value: collectionRoute) {
                         CollectionBanner(collection: collection)
                     }
                     .buttonStyle(.plain)
+                    .zoomSource(id: collectionRoute)
                 }
             } else if let tv = viewModel.tvDetail {
                 OverviewSection(tagline: tv.tagline, overview: tv.overview)
@@ -210,6 +223,5 @@ struct DetailPageView: View {
 #Preview("Loading Skeleton") {
     NavigationStack {
         DetailPageView(id: 693134, mediaType: .movie).skeletonView
-            .background(Color.black.ignoresSafeArea())
     }
 }

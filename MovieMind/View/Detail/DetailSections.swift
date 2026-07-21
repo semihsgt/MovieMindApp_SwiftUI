@@ -303,7 +303,8 @@ struct CastSection: View {
                     LazyHStack(spacing: 10) {
                         ForEach(Array(cast.prefix(15)), id: \.uniqueId) { member in
                             if let personId = member.id {
-                                NavigationLink(value: MediaRoute(id: personId, mediaType: .person)) {
+                                let route = MediaRoute(id: personId, mediaType: .person)
+                                NavigationLink(value: route) {
                                     VStack(spacing: 4) {
                                         AsyncPoster(path: member.profilePath,
                                                     width: 100, height: 150,
@@ -319,6 +320,7 @@ struct CastSection: View {
                                     .frame(width: 100)
                                     .foregroundStyle(.white)
                                 }
+                                .zoomSource(id: route)
                             }
                         }
                     }
