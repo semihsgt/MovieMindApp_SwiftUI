@@ -18,31 +18,28 @@ Built with SwiftUI, Swift Concurrency, and SwiftData.
 
 ## Features
 
-- **AI recommendations** — a "For You" rail on Home suggests titles from your watchlist, and an "Ask AI" assistant turns a mood or vibe ("mind-bending sci-fi", "shows like The Office") into real, tappable results
-- **Home** — trending hero carousel with parallax header and title logos, curated sections with Movie/TV toggles, and an AI shortcut card
-- **Detail pages** — overview, metadata, cast, where-to-watch providers, similar titles, TV seasons & next-episode info, movie collections
-- **Search** — debounced multi-search with infinite scroll pagination, plus an inline entry point to ask AI about the same query
-- **Upcoming** — region-aware release calendar with relative dates ("Releases on Saturday")
-- **Library** — persistent watchlist (SwiftData) with category filters and swipe-to-delete
-- **Zoom transitions** — posters expand into detail pages with the iOS 18 `.zoom` navigation transition, everywhere they appear
-- **Region-aware content** — in-theatre listings, upcoming releases, and streaming providers all follow the device locale
-- **Polished loading UX** — shimmer skeleton screens on every page; content is revealed with a fade-in only after its images are cached, so posters never pop in one by one
+- **AI recommendations** — a "For You" rail on Home suggests titles from your watchlist, and an "Ask AI" assistant.
+- **Home** — trending hero carousel, sections with Movie/TV toggles.
+- **Detail pages** — overview, metadata, cast, watch providers, collections and more.
+- **Search** — debounced multi search, plus an inline entry point to ask AI about the same query.
+- **Upcoming** — region aware release calendar with relative dates.
+- **Library** — persistent watchlist with category filters and swipe to delete action.
 
 ## AI, without the hallucinations
 
-MovieMind uses Gemini for *taste*, not for *facts*. The model never invents database IDs, posters, or ratings — it only proposes titles, which are then resolved against TMDB in a second step:
+MovieMind uses Gemini AI models. The model never invents database IDs, posters, or ratings — it only proposes titles, which are then resolved against TMDB in a second step:
 
 ```
 Watchlist / prompt ──▶ Gemini (structured JSON)         ──▶ TMDB search ──▶ real MediaItem
                        [{ title, year, mediaType }, …]        (per title)     (real id, poster, score)
 ```
 
-- **Structured output** — requests set a `responseSchema`, so Gemini returns strict JSON that decodes straight into `Codable` models — no fragile text parsing
-- **Grounded results** — every suggested title is looked up via TMDB `search`, matched by year, and de-duplicated; anything the model imagines that TMDB doesn't have simply drops out
-- **Multi-turn chat** — "Ask AI" keeps conversation history, so follow-ups like "funnier ones" or "but shorter" work
-- **Quota-friendly** — watchlist recommendations are debounced and cached by a content signature, so Gemini is only called when the watchlist actually changes
-- **Fully optional** — with no Gemini key configured the AI surfaces hide themselves gracefully; the rest of the app is unaffected
-- **Free tier** — resolves the current free Gemini Flash model via a `-latest` alias chain (`gemini-flash-lite-latest` → `gemini-flash-latest` → `gemini-2.5-flash`), so a deprecated model is handled automatically
+- **Structured output** — requests set a `responseSchema`, so Gemini returns JSON that decodes straight into project models.
+- **Grounded results** — every suggested title is looked up via TMDB `search`, matched by year, and de-duplicated.
+- **Multi-turn chat** — "Ask AI" keeps conversation history, so follow ups like "funnier ones" or "but shorter" work.
+- **Quota-friendly** — watchlist recommendations are debounced and cached by a content signature, so Gemini is only called when the watchlist actually changes.
+- **Fully optional** — with no Gemini key configured the AI surfaces hide themselves gracefully. The rest of the app is unaffected.
+- **Free tier** — resolves the current free Gemini Flash model via a `-latest` alias chain (`gemini-flash-lite-latest` → `gemini-flash-latest` → `gemini-2.5-flash`), so a deprecated model is handled automatically.
 
 ## Architecture
 
@@ -73,14 +70,14 @@ MovieMind/
 
 ### Key decisions
 
-- **`ViewState<T>`** — a single enum (`idle / loading / loaded / failed`) per screen makes conflicting UI states unrepresentable; a generic `StateContainerView` renders a custom skeleton (or default spinner), a shared error + retry screen, or the content with a fade transition
-- **`actor NetworkManager`** — all TMDB requests funnel through one actor; endpoints are type-safe enums behind a small `Endpoint` protocol, so adding an API call is a ~15-line enum case
-- **`actor GeminiService`** — the AI layer mirrors the networking layer: an `AIServicing` protocol exposes `generate` (one-shot) and `chat` (multi-turn), both encoding a recursive `JSONSchema` and returning decoded models; a `AIMediaResolver` turns Gemini's titles into TMDB `MediaItem`s and is shared by the recommendation and chat services
-- **Two-step grounding** — separating "what to suggest" (Gemini) from "what it actually is" (TMDB) keeps the model honest and reuses the existing search pipeline
-- **Value-based navigation** — components emit a `MediaRoute` (or `AskAIRoute`); each `NavigationStack` resolves destinations centrally, keeping leaf views destination-agnostic
-- **Zoom transitions** — a `zoomSource` / `zoomDestination` pair shares a `Namespace.ID` through the environment, so any poster can drive the `.zoom` transition without threading the namespace by hand; a per-placement source key avoids collisions when the same title appears in multiple rails
-- **Image prefetching** — view models warm the shared `URLCache` before flipping state to `.loaded`; `AsyncPoster` self-heals transient failures with backoff
-- **SwiftData** — lightweight watchlist persistence storing references, not payloads; details are always re-fetched fresh, and the same store seeds the AI recommendations
+- **ViewState<T>** — A single enum per screen makes conflicting UI states unrepresentable. A generic `StateContainerView` renders a custom shimmering skeleton, a shared error + retry screen, or the content with a fade transition.
+- **actor NetworkManager** — All TMDB requests funnel through one actor. Endpoints are type safe enums behind a small `Endpoint` protocol, so adding an API call is a 15 line enum case.
+- **actor GeminiService** — The AI layer mirrors the networking layer. An `AIServicing` protocol exposes `generate` and `chat`, both encoding a recursive `JSONSchema` and returning decoded models. A `AIMediaResolver` turns Gemini's titles into TMDB `MediaItem`s and is shared by the recommendation and chat services.
+- **Two-step grounding** — Separating "what to suggest" (Gemini) from "what it actually is" (TMDB) keeps the model honest and reuses the existing search pipeline.
+- **Value-based navigation** — Components emit a `MediaRoute` or `AskAIRoute`. Each `NavigationStack` resolves destinations centrally, keeping leaf views destination agnostic.
+- **Zoom transitions** — A `zoomSource` / `zoomDestination` pair shares a `Namespace.ID` through the environment, so any poster can drive the `.zoom` transition without threading the namespace by hand. A per placement source key avoids collisions when the same title appears in multiple rails.
+- **Image prefetching** — View models warm the shared `URLCache` before flipping state to `.loaded`. `AsyncPoster` self-heals transient failures with backoff.
+- **SwiftData** — Lightweight watchlist persistence storing references, not payloads. Details are always refetched fresh, and the same store seeds the AI recommendations.
 
 ## Tech Stack
 
@@ -88,10 +85,10 @@ MovieMind/
 |---|---|
 | UI | SwiftUI, [FluidHeader](https://github.com/Segyun/FluidHeader) |
 | AI | Google Gemini API (Flash, free tier) with structured output |
-| Concurrency | async/await, `async let`, `TaskGroup`, actors |
+| Concurrency | async/await, async let, TaskGroup, actors |
 | Persistence | SwiftData |
 | Networking | URLSession, TMDB API v3 |
-| Min. iOS | 18.0 |
+| Deployment Target | iOS 18.0 |
 
 ## Setup
 
