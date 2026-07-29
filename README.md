@@ -93,8 +93,7 @@ MovieMind/
 ## Setup
 
 1. Clone the repo
-2. Get a free API key from [TMDB](https://www.themoviedb.org/settings/api)
-3. *(Optional, for AI features)* Get a free key from [Google AI Studio](https://aistudio.google.com/apikey)
+2. Get a free API key from [TMDB](https://developer.themoviedb.org/docs/getting-started) *(Required)* and [Google AI Studio](https://ai.google.dev/gemini-api/docs/api-key#import-projects) *(Optional)*
 4. Copy `SecretsExample.xcconfig` → `Secrets.xcconfig` and add your keys:
    ```
    TMDB_API_KEY = your_tmdb_key_here
