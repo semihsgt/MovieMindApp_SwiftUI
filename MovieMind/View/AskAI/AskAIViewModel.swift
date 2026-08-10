@@ -54,9 +54,12 @@ final class AskAIViewModel {
             messages.append(Message(role: .assistant, text: result.reply, items: result.items))
         } catch {
             let message: String
-            if case .missingKey? = error as? AIError {
+            switch error as? AIError {
+            case .missingKey:
                 message = "AI is not configured. Add a Gemini API key to enable this feature."
-            } else {
+            case .quotaExceeded:
+                message = "You've reached today's free AI usage limit. Please try again later."
+            default:
                 message = "I couldn't respond just now. Please try again."
             }
             messages.append(Message(role: .assistant, text: message))

@@ -186,6 +186,8 @@ struct HomePageView: View {
                 SectionView(title: "For You",
                             description: "AI picks based on your library.",
                             data: viewModel.recommendations)
+            } else if let notice = viewModel.recommendationNotice {
+                aiNoticeBanner(notice)
             }
 
             SectionView(title: "Popular",
@@ -227,6 +229,26 @@ struct HomePageView: View {
             .padding(.bottom, -30)
             .blur(radius: 10)
         }
+    }
+
+    private func aiNoticeBanner(_ message: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.yellow)
+                .font(.footnote)
+                .padding(.top, 2)
+
+            Text(message)
+                .font(.footnote)
+                .foregroundStyle(.white.opacity(0.8))
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
+        }
+        .padding()
+        .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal)
+        .padding(.bottom, 40)
     }
 }
 

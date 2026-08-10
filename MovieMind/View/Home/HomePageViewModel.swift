@@ -45,6 +45,7 @@ final class HomePageViewModel {
     private(set) var popularP: ListRespond?
 
     private(set) var recommendations: [MediaItem] = []
+    private(set) var recommendationNotice: String?
 
     private var trendingAll: ListRespond?
     private var lastSeedSignature: String?
@@ -165,6 +166,7 @@ final class HomePageViewModel {
     func loadRecommendations(seeds: [LibrarySeed]) async {
         guard !seeds.isEmpty else {
             recommendations = []
+            recommendationNotice = nil
             lastSeedSignature = nil
             return
         }
@@ -181,14 +183,23 @@ final class HomePageViewModel {
             return
         }
 
-        guard let items = try? await recommender.recommend(from: seeds), !items.isEmpty else {
-            return
-        }
-
         lastSeedSignature = signature
-        withAnimation(.easeInOut(duration: 0.4)) {
-            recommendations = items
+
+        do {
+            let items = try await recommender.recommend(from: seeds)
+            guard !items.isEmpty else { return }
+
+            recommendationNotice = nil
+            withAnimation(.easeInOut(duration: 0.4)) {
+                recommendations = items
+            }
+        } catch {
+            recommendationNotice = Self.notice(for: error)
         }
+    }
+
+    private static func notice(for error: Error) -> String {
+        (error as? AIError)?.errorDescription ?? "AI recommendations are unavailable right now."
     }
 
     func refetchSection(_ section: PickerSection) async {

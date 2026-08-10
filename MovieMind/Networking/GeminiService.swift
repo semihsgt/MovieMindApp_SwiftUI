@@ -29,6 +29,7 @@ enum AIError: Error, LocalizedError {
     case modelUnavailable
     case emptyResponse
     case decodingError(Error)
+    case quotaExceeded
 
     var errorDescription: String? {
         switch self {
@@ -38,6 +39,7 @@ enum AIError: Error, LocalizedError {
         case .modelUnavailable: return "No supported Gemini model is available for this key."
         case .emptyResponse: return "Gemini returned no usable content."
         case .decodingError(let error): return "Gemini decoding error: \(error.localizedDescription)"
+        case .quotaExceeded: return "You've reached today's free AI usage limit. Please try again later."
         }
     }
 }
@@ -164,6 +166,7 @@ actor GeminiService: AIServicing {
         }
         guard (200...299).contains(httpResponse.statusCode) else {
             if httpResponse.statusCode == 404 { throw AIError.modelUnavailable }
+            if httpResponse.statusCode == 429 { throw AIError.quotaExceeded }
             throw AIError.invalidResponse
         }
 
