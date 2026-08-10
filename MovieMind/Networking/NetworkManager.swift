@@ -20,6 +20,7 @@ protocol NetworkServicing: Sendable {
 }
 
 enum NetworkError: Error, LocalizedError {
+    case missingKey
     case invalidURL
     case invalidResponse
     case decodingError(Error)
@@ -27,6 +28,7 @@ enum NetworkError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
+        case .missingKey: return "TMDB API key is not configured. Copy SecretsExample.xcconfig as Secrets.xcconfig and add your key."
         case .invalidURL: return "Invalid URL address."
         case .invalidResponse: return "An invalid response was received from the server."
         case .decodingError(let error): return "Data decoding error: \(error.localizedDescription)"
@@ -48,10 +50,10 @@ actor NetworkManager: NetworkServicing {
         return decoder
     }()
 
-    private func buildURL(for endpoint: Endpoint) -> URL? {
+    private func buildURL(for endpoint: Endpoint, apiKey: String) -> URL? {
         guard var components = URLComponents(string: "\(baseURL)/\(endpoint.path)") else { return nil }
 
-        var queryItems = [URLQueryItem(name: "api_key", value: Secrets.apiKey)]
+        var queryItems = [URLQueryItem(name: "api_key", value: apiKey)]
         queryItems.append(contentsOf: endpoint.queryItems)
 
         components.queryItems = queryItems
@@ -59,7 +61,11 @@ actor NetworkManager: NetworkServicing {
     }
 
     private func performCall<T: Decodable>(for endpoint: Endpoint) async throws -> T {
-        guard let url = buildURL(for: endpoint) else {
+        guard let apiKey = Secrets.apiKey else {
+            throw NetworkError.missingKey
+        }
+
+        guard let url = buildURL(for: endpoint, apiKey: apiKey) else {
             throw NetworkError.invalidURL
         }
 
