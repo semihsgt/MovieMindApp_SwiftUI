@@ -32,18 +32,23 @@ enum PickerSection {
 final class HomePageViewModel {
 
     private(set) var state: ViewState<[HeroUIModel]> = .idle
+
     var trendingType: MediaTypeForPicker? = .movie
     var topRatedType: MediaTypeForPicker? = .movie
     var popularType: MediaTypeForPicker? = .movie
+
     private(set) var nowPlayingM: ListRespond?
     private(set) var trendingMT: ListRespond?
     private(set) var topRatedMT: ListRespond?
     private(set) var popularMT: ListRespond?
     private(set) var airingT: ListRespond?
     private(set) var popularP: ListRespond?
+
     private(set) var recommendations: [MediaItem] = []
+
     private var trendingAll: ListRespond?
     private var lastSeedSignature: String?
+
     private let networkService: NetworkServicing
     private let genreStore: GenreStore
     private let recommender: AIRecommendationService
@@ -157,7 +162,7 @@ final class HomePageViewModel {
     }
 
 
-    func loadRecommendations(seeds: [WatchlistSeed]) async {
+    func loadRecommendations(seeds: [LibrarySeed]) async {
         guard !seeds.isEmpty else {
             recommendations = []
             lastSeedSignature = nil

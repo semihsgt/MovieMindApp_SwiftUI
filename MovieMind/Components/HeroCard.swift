@@ -10,20 +10,20 @@ import SwiftUI
 struct HeroCard: View {
     let item: HeroUIModel
     let isButtonDisplayed: Bool
-    
+
     init(item: HeroUIModel, isButtonDisplayed: Bool = true) {
         self.item = item
         self.isButtonDisplayed = isButtonDisplayed
     }
-    
+
     private var mediaType: MediaType? {
         item.result.mediaType
     }
-    
+
     private var posterPath: String? {
         item.images?.bestPoster ?? item.result.displayPath
     }
-    
+
     private var logoPath: String? {
         item.images?.bestLogo()
     }
@@ -31,7 +31,7 @@ struct HeroCard: View {
     private var shouldShowTitle: Bool {
         mediaType == .person || posterPath != item.result.displayPath
     }
-    
+
     private var mediaTypeLabel: String {
         switch mediaType {
         case .person: return "Person"
@@ -40,7 +40,7 @@ struct HeroCard: View {
         case .none: return ""
         }
     }
-    
+
     var body: some View {
         ZStack {
             LinearGradient(
@@ -55,22 +55,22 @@ struct HeroCard: View {
                 startPoint: .top,
                 endPoint: .bottom
             )
-            
+
             if isButtonDisplayed {
                 VStack(spacing: 0) {
                     Spacer()
-                    
+
                     if shouldShowTitle {
                         titleView
                             .padding(.bottom, 8)
                     }
-                    
+
                     subtitleView
                         .shadow(radius: 10)
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.9))
                         .padding(.bottom, 20)
-                    
+
                     actionButtonsView
                         .shadow(radius: 10)
                         .padding(.bottom, 20)
@@ -93,7 +93,7 @@ struct HeroCard: View {
         }
         .clipped()
     }
-    
+
     @ViewBuilder
     private var backgroundImageView: some View {
         if let path = posterPath {
@@ -103,8 +103,8 @@ struct HeroCard: View {
                 .fill(Color.black.opacity(0.8))
         }
     }
-    
-    
+
+
     @ViewBuilder
     private var titleView: some View {
         if let url = TMDBImage.url(for: logoPath, size: .w500) {
@@ -129,7 +129,7 @@ struct HeroCard: View {
             fallbackTitleView
         }
     }
-    
+
     private var fallbackTitleView: some View {
         Text(item.result.displayName)
             .font(.system(size: 32, weight: .heavy, design: .rounded))
@@ -139,19 +139,19 @@ struct HeroCard: View {
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 25)
     }
-    
+
     @ViewBuilder
     private var subtitleView: some View {
         switch mediaType {
         case .person:
             HStack(spacing: 6) {
                 Text(mediaTypeLabel)
-                
+
                 if let department = item.result.knownForDepartment {
                     Text("•")
                     Text(department)
                 }
-                
+
                 if let topKnown = item.result.knownFor?.first {
                     let topTitle = topKnown.title ?? topKnown.name ?? ""
                     if !topTitle.isEmpty {
@@ -161,16 +161,16 @@ struct HeroCard: View {
                     }
                 }
             }
-            
+
         case .tv, .movie:
             HStack(spacing: 6) {
                 Text(mediaTypeLabel)
-                
+
                 ForEach(Array(item.genreNames.prefix(2)), id: \.self) { genreName in
                     Text("•")
                     Text(genreName)
                 }
-                
+
                 if item.result.adult == true {
                     Text("•")
                     Text("18+")
@@ -178,12 +178,12 @@ struct HeroCard: View {
                         .fontWeight(.bold)
                 }
             }
-            
+
         case .none:
             EmptyView()
         }
     }
-    
+
     private var actionButtonsView: some View {
         HStack(spacing: 12) {
             NavigationLink(value: MediaRoute(id: item.id, mediaType: item.result.mediaType ?? .movie)) {
@@ -196,8 +196,8 @@ struct HeroCard: View {
                 .foregroundStyle(.black)
                 .background(.white, in: .capsule)
             }
-            
-            WatchlistButton(
+
+            LibraryButton(
                 mediaId: item.id,
                 mediaType: item.result.mediaType ?? .movie,
                 displayName: item.result.displayName,

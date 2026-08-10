@@ -12,7 +12,7 @@ struct DetailPageView: View {
     @State private var viewModel = DetailPageViewModel()
     let id: Int
     let mediaType: MediaType
-    
+
     var body: some View {
         StateContainerView(state: viewModel.state) {
             await viewModel.load(id: id, mediaType: mediaType)
@@ -26,7 +26,7 @@ struct DetailPageView: View {
         .toolbar {
             if let item = viewModel.state.value {
                 ToolbarItem(placement: .topBarTrailing) {
-                    WatchlistButton(
+                    LibraryButton(
                         mediaId: item.id,
                         mediaType: item.result.mediaType ?? .movie,
                         displayName: item.result.displayName,
@@ -41,9 +41,9 @@ struct DetailPageView: View {
         .task(id: "\(mediaType.rawValue)-\(id)") {
             await viewModel.loadIfNeeded(id: id, mediaType: mediaType)
         }
-        
+
     }
-    
+
     private func detailScrollContent(for item: HeroUIModel) -> some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 0) {
@@ -53,7 +53,7 @@ struct DetailPageView: View {
                 .fluidHeaderBlurOffset(220)
                 .fluidHeaderBlurHeight(40)
                 .fluidHeaderOpacityHeight(300)
-                
+
                 detailContent(for: item)
                     .padding(.top, 24)
                     .background(alignment: .top) {
@@ -70,31 +70,31 @@ struct DetailPageView: View {
         }
         .ignoresSafeArea(edges: .top)
     }
-    
+
     var skeletonView: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 0) {
                 heroSkeleton
-                
+
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 10) {
                         RoundedRectangle(cornerRadius: 4)
                             .fill(Color.white.opacity(0.08))
                             .frame(height: 14)
                             .shimmer()
-                        
+
                         RoundedRectangle(cornerRadius: 4)
                             .fill(Color.white.opacity(0.08))
                             .frame(height: 14)
                             .shimmer()
-                        
+
                         RoundedRectangle(cornerRadius: 4)
                             .fill(Color.white.opacity(0.08))
                             .frame(width: 180, height: 14)
                             .shimmer()
                     }
                     .padding(.horizontal)
-                    
+
                     castRowSkeleton
                 }
                 .padding(.top, 24)
@@ -104,7 +104,7 @@ struct DetailPageView: View {
         }
         .ignoresSafeArea(edges: .top)
     }
-    
+
     private var heroSkeleton: some View {
         Rectangle()
             .fill(Color.white.opacity(0.08))
@@ -113,7 +113,7 @@ struct DetailPageView: View {
             .frame(maxWidth: .infinity)
             .ignoresSafeArea(edges: .top)
     }
-    
+
     private var castRowSkeleton: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
@@ -127,7 +127,7 @@ struct DetailPageView: View {
             .padding(.horizontal)
         }
     }
-    
+
     @ViewBuilder
     private func detailContent(for hero: HeroUIModel) -> some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -160,22 +160,22 @@ struct DetailPageView: View {
                             description: "Most popular credits.",
                             data: viewModel.knownFor)
             }
-            
+
             WatchProvidersSection(providers: viewModel.watchProviders)
-            
+
             SectionView(title: "Similar",
                         description: "More like this.",
                         data: viewModel.similar?.results)
         }
         .padding(.bottom, 40)
     }
-    
+
     private func directorNames(_ movie: MovieDetail) -> [String] {
         (movie.credits?.crew ?? [])
             .filter { $0.job == "Director" }
             .compactMap(\.name)
     }
-    
+
     private func movieMetadata(_ movie: MovieDetail) -> [String] {
         var items: [String] = []
         if let year = movie.releaseDate?.prefix(4), !year.isEmpty { items.append(String(year)) }
@@ -184,7 +184,7 @@ struct DetailPageView: View {
         if let status = movie.status, status != "Released" { items.append(status) }
         return items
     }
-    
+
     private func tvMetadata(_ tv: TVDetail) -> [String] {
         var items: [String] = []
         if let year = tv.firstAirDate?.prefix(4), !year.isEmpty { items.append(String(year)) }
@@ -193,7 +193,7 @@ struct DetailPageView: View {
         if let status = tv.status, status == "Ended" || status == "Canceled" { items.append(status) }
         return items
     }
-    
+
 }
 
 #Preview("Movie") {

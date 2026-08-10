@@ -18,26 +18,26 @@ Built with SwiftUI, Swift Concurrency, and SwiftData.
 
 ## Features
 
-- **AI recommendations** — a "For You" rail on Home suggests titles from your watchlist, and an "Ask AI" assistant.
+- **AI recommendations** — a "For You" rail on Home suggests titles from your library, and an "Ask AI" assistant.
 - **Home** — trending hero carousel, sections with Movie/TV toggles.
 - **Detail pages** — overview, metadata, cast, watch providers, collections and more.
 - **Search** — debounced multi search, plus an inline entry point to ask AI about the same query.
 - **Upcoming** — region aware release calendar with relative dates.
-- **Library** — persistent watchlist with category filters and swipe to delete action.
+- **Library** — persistent library with category filters and swipe to delete action.
 
 ## AI, without the hallucinations
 
 MovieMind uses Gemini AI models. The model never invents database IDs, posters, or ratings — it only proposes titles, which are then resolved against TMDB in a second step:
 
 ```
-Watchlist / prompt ──▶ Gemini (structured JSON)         ──▶ TMDB search ──▶ real MediaItem
+Library / prompt ──▶ Gemini (structured JSON)         ──▶ TMDB search ──▶ real MediaItem
                        [{ title, year, mediaType }, …]        (per title)     (real id, poster, score)
 ```
 
 - **Structured output** — requests set a `responseSchema`, so Gemini returns JSON that decodes straight into project models.
 - **Grounded results** — every suggested title is looked up via TMDB `search`, matched by year, and de-duplicated.
 - **Multi-turn chat** — "Ask AI" keeps conversation history, so follow ups like "funnier ones" or "but shorter" work.
-- **Quota-friendly** — watchlist recommendations are debounced and cached by a content signature, so Gemini is only called when the watchlist actually changes.
+- **Quota-friendly** — library recommendations are debounced and cached by a content signature, so Gemini is only called when the library actually changes.
 - **Fully optional** — with no Gemini key configured the AI surfaces hide themselves gracefully. The rest of the app is unaffected.
 - **Free tier** — resolves the current free Gemini Flash model via a `-latest` alias chain (`gemini-flash-lite-latest` → `gemini-flash-latest` → `gemini-2.5-flash`), so a deprecated model is handled automatically.
 
@@ -46,7 +46,7 @@ Watchlist / prompt ──▶ Gemini (structured JSON)         ──▶ TMDB sea
 **MVVM + protocol-oriented services:**
 
 ```
-Views (SwiftUI) ──▶ ViewModels (@MainActor, ObservableObject)
+Views (SwiftUI) ──▶ ViewModels (@MainActor, @Observable)
                          │  ViewState<T>
               ┌──────────┴───────────┐
               ▼                      ▼
@@ -77,7 +77,7 @@ MovieMind/
 - **Value-based navigation** — Components emit a `MediaRoute` or `AskAIRoute`. Each `NavigationStack` resolves destinations centrally, keeping leaf views destination agnostic.
 - **Zoom transitions** — A `zoomSource` / `zoomDestination` pair shares a `Namespace.ID` through the environment, so any poster can drive the `.zoom` transition without threading the namespace by hand. A per placement source key avoids collisions when the same title appears in multiple rails.
 - **Image prefetching** — View models warm the shared `URLCache` before flipping state to `.loaded`. `AsyncPoster` self-heals transient failures with backoff.
-- **SwiftData** — Lightweight watchlist persistence storing references, not payloads. Details are always refetched fresh, and the same store seeds the AI recommendations.
+- **SwiftData** — Lightweight library persistence storing references, not payloads. Details are always refetched fresh, and the same store seeds the AI recommendations.
 
 ## Tech Stack
 

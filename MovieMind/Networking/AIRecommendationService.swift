@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct WatchlistSeed: Sendable, Hashable {
+struct LibrarySeed: Sendable, Hashable {
     let title: String
     let mediaType: MediaType
 }
@@ -89,7 +89,7 @@ actor AIRecommendationService {
         self.network = network
     }
 
-    func recommend(from seeds: [WatchlistSeed], limit: Int = 12) async throws -> [MediaItem] {
+    func recommend(from seeds: [LibrarySeed], limit: Int = 12) async throws -> [MediaItem] {
         guard !seeds.isEmpty else { return [] }
 
         let schema = JSONSchema.array(items: .object(
@@ -111,13 +111,13 @@ actor AIRecommendationService {
         return await AIMediaResolver.resolve(recommendations, excludingTitles: excluded, using: network)
     }
 
-    private static func buildPrompt(seeds: [WatchlistSeed], limit: Int) -> String {
+    private static func buildPrompt(seeds: [LibrarySeed], limit: Int) -> String {
         let list = seeds
             .map { "- \($0.title) (\($0.mediaType == .tv ? "TV" : "Movie"))" }
             .joined(separator: "\n")
 
         return """
-        A user saved these titles to their movie/TV watchlist:
+        A user saved these titles to their movie/TV library:
         \(list)
 
         Recommend \(limit) movies or TV shows they are likely to enjoy, based on shared \

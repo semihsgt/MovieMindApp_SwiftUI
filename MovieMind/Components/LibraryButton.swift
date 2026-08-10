@@ -1,5 +1,5 @@
 //
-//  WatchlistButton.swift
+//  LibraryButton.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 7.07.2026.
@@ -8,18 +8,18 @@
 import SwiftUI
 import SwiftData
 
-struct WatchlistButton: View {
-    
+struct LibraryButton: View {
+
     @Environment(\.modelContext) private var modelContext
-    @Query private var savedItems: [WatchlistItem]
-    
+    @Query private var savedItems: [LibraryItem]
+
     private let mediaId: Int
     private let mediaType: MediaType
     private let displayName: String
     private let posterPath: String?
     private let diameter: CGFloat
     private let showsBackground: Bool
-    
+
     init(mediaId: Int,
          mediaType: MediaType,
          displayName: String,
@@ -32,17 +32,17 @@ struct WatchlistButton: View {
         self.posterPath = posterPath
         self.diameter = diameter
         self.showsBackground = showsBackground
-        
-        let key = WatchlistItem.key(id: mediaId, mediaType: mediaType)
-        var descriptor = FetchDescriptor<WatchlistItem>(
+
+        let key = LibraryItem.key(id: mediaId, mediaType: mediaType)
+        var descriptor = FetchDescriptor<LibraryItem>(
             predicate: #Predicate { $0.key == key }
         )
         descriptor.fetchLimit = 1
         _savedItems = Query(descriptor)
     }
-    
+
     private var isSaved: Bool { !savedItems.isEmpty }
-    
+
     var body: some View {
         Button {
             withAnimation(.snappy) { toggle() }
@@ -58,14 +58,14 @@ struct WatchlistButton: View {
                 }
         }
         .sensoryFeedback(.success, trigger: isSaved)
-        .accessibilityLabel(isSaved ? "Remove from watchlist" : "Add to watchlist")
+        .accessibilityLabel(isSaved ? "Remove from library" : "Add to library")
     }
-    
+
     private func toggle() {
         if let existing = savedItems.first {
             modelContext.delete(existing)
         } else {
-            modelContext.insert(WatchlistItem(
+            modelContext.insert(LibraryItem(
                 mediaId: mediaId,
                 mediaType: mediaType,
                 displayName: displayName,

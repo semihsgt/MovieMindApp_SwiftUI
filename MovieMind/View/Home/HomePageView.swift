@@ -9,8 +9,8 @@ import SwiftUI
 import SwiftData
 import FluidHeader
 
-private let recommendationSeedDescriptor: FetchDescriptor<WatchlistItem> = {
-    var descriptor = FetchDescriptor<WatchlistItem>(
+private let recommendationSeedDescriptor: FetchDescriptor<LibraryItem> = {
+    var descriptor = FetchDescriptor<LibraryItem>(
         sortBy: [SortDescriptor(\.dateAdded, order: .reverse)]
     )
     descriptor.fetchLimit = 20
@@ -21,14 +21,14 @@ struct HomePageView: View {
     @State private var viewModel = HomePageViewModel()
     @Namespace private var zoomNamespace
 
-    @Query(recommendationSeedDescriptor) private var watchlist: [WatchlistItem]
+    @Query(recommendationSeedDescriptor) private var library: [LibraryItem]
 
-    private var watchlistSeeds: [WatchlistSeed] {
-        watchlist.map { WatchlistSeed(title: $0.displayName, mediaType: $0.mediaType) }
+    private var librarySeeds: [LibrarySeed] {
+        library.map { LibrarySeed(title: $0.displayName, mediaType: $0.mediaType) }
     }
 
     private var seedSignature: String {
-        watchlist.map(\.key).joined(separator: ",")
+        library.map(\.key).joined(separator: ",")
     }
 
     var body: some View {
@@ -60,7 +60,7 @@ struct HomePageView: View {
             await viewModel.loadIfNeeded()
         }
         .task(id: seedSignature) {
-            await viewModel.loadRecommendations(seeds: watchlistSeeds)
+            await viewModel.loadRecommendations(seeds: librarySeeds)
         }
         .task(id: viewModel.trendingType) {
             await viewModel.refetchSection(.trending)
@@ -184,7 +184,7 @@ struct HomePageView: View {
 
             if !viewModel.recommendations.isEmpty {
                 SectionView(title: "For You",
-                            description: "AI picks based on your watchlist.",
+                            description: "AI picks based on your library.",
                             data: viewModel.recommendations)
             }
 
@@ -232,7 +232,7 @@ struct HomePageView: View {
 
 #Preview {
     HomePageView()
-        .modelContainer(for: WatchlistItem.self, inMemory: true)
+        .modelContainer(for: LibraryItem.self, inMemory: true)
 }
 
 #Preview("Loading Skeleton") {

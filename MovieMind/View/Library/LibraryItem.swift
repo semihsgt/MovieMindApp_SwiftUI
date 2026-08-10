@@ -1,5 +1,5 @@
 //
-//  WatchlistItem.swift
+//  LibraryItem.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 6.07.2026.
@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class WatchlistItem {
+final class LibraryItem {
 
     @Attribute(.unique) var key: String
 
