@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-internal import Combine
 
 struct HeroUIModel: Identifiable {
     let id: Int
@@ -29,26 +28,22 @@ enum PickerSection {
 }
 
 @MainActor
-final class HomePageViewModel: ObservableObject {
-    
-    @Published private(set) var state: ViewState<[HeroUIModel]> = .idle
-    
-    @Published var trendingType: MediaTypeForPicker? = .movie
-    @Published var topRatedType: MediaTypeForPicker? = .movie
-    @Published var popularType: MediaTypeForPicker? = .movie
-    
-    @Published private(set) var nowPlayingM: ListRespond?
-    @Published private(set) var trendingMT: ListRespond?
-    @Published private(set) var topRatedMT: ListRespond?
-    @Published private(set) var popularMT: ListRespond?
-    @Published private(set) var airingT: ListRespond?
-    @Published private(set) var popularP: ListRespond?
+@Observable
+final class HomePageViewModel {
 
-    @Published private(set) var recommendations: [MediaItem] = []
-
+    private(set) var state: ViewState<[HeroUIModel]> = .idle
+    var trendingType: MediaTypeForPicker? = .movie
+    var topRatedType: MediaTypeForPicker? = .movie
+    var popularType: MediaTypeForPicker? = .movie
+    private(set) var nowPlayingM: ListRespond?
+    private(set) var trendingMT: ListRespond?
+    private(set) var topRatedMT: ListRespond?
+    private(set) var popularMT: ListRespond?
+    private(set) var airingT: ListRespond?
+    private(set) var popularP: ListRespond?
+    private(set) var recommendations: [MediaItem] = []
     private var trendingAll: ListRespond?
     private var lastSeedSignature: String?
-
     private let networkService: NetworkServicing
     private let genreStore: GenreStore
     private let recommender: AIRecommendationService
@@ -60,12 +55,12 @@ final class HomePageViewModel: ObservableObject {
         self.genreStore = genreStore
         self.recommender = recommender
     }
-    
+
     func loadIfNeeded() async {
         guard case .idle = state else { return }
         await load()
     }
-    
+
     func load() async {
         state = .loading
 
@@ -113,7 +108,7 @@ final class HomePageViewModel: ObservableObject {
     private func posterURLs(in list: ListRespond?) -> [URL] {
         (list?.results ?? []).compactMap { TMDBImage.url(for: $0.displayPath, size: .w500) }
     }
-        
+
     private func fetchAllSections() async throws {
         async let all = networkService.fetchList(for: .trendingAll)
         async let nowM = try? networkService.fetchList(for: .nowPlayingMovies)
@@ -122,11 +117,11 @@ final class HomePageViewModel: ObservableObject {
         async let popMT = try? networkService.fetchList(for: .popularMovies)
         async let airT = try? networkService.fetchList(for: .airingTodayTV)
         async let popP = try? networkService.fetchList(for: .popularPeople)
-        
+
         self.trendingAll = try await all
         let (nowMR, trendMTR, topMTR, popMTR, airTR, popPR)
         = await (nowM, trendMT, topMT, popMT, airT, popP)
-        
+
         self.nowPlayingM = nowMR?.stamping(.movie)
         self.trendingMT = trendMTR?.stamping(.movie)
         self.topRatedMT = topMTR?.stamping(.movie)
@@ -134,34 +129,34 @@ final class HomePageViewModel: ObservableObject {
         self.airingT = airTR?.stamping(.tv)
         self.popularP = popPR?.stamping(.person)
     }
-    
+
     private func buildHeroItems() async -> [HeroUIModel] {
         guard let results = trendingAll?.results else { return [] }
         let genreDictionary = await genreStore.genreDictionary()
         var preparedItems: [HeroUIModel] = []
-        
+
         await withTaskGroup(of: HeroUIModel?.self) { group in
             for item in results {
                 guard let id = item.id, let mediaType = item.mediaType else { continue }
-                
+
                 group.addTask { [networkService] in
                     let fetchedImages = try? await networkService.fetchImages(id: id, for: mediaType)
                     let names = (item.genreIds ?? []).compactMap { genreDictionary[$0] }
                     return HeroUIModel(id: id, result: item, images: fetchedImages, genreNames: names)
                 }
             }
-            
+
             for await model in group {
                 if let model { preparedItems.append(model) }
             }
         }
-        
+
         return results.compactMap { original in
             preparedItems.first(where: { $0.id == original.id })
         }
     }
-    
-    
+
+
     func loadRecommendations(seeds: [WatchlistSeed]) async {
         guard !seeds.isEmpty else {
             recommendations = []

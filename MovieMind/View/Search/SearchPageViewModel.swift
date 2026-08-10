@@ -6,17 +6,15 @@
 //
 
 import SwiftUI
-internal import Combine
 
 @MainActor
-final class SearchViewModel: ObservableObject {
+@Observable
+final class SearchViewModel {
 
     private let networkService: NetworkServicing
-
-    @Published var searchText: String = ""
-    @Published private(set) var state: ViewState<[MediaItem]> = .idle
-    @Published private(set) var isLoadingMore: Bool = false
-
+    var searchText: String = ""
+    private(set) var state: ViewState<[MediaItem]> = .idle
+    private(set) var isLoadingMore: Bool = false
     private var currentPage = 1
     private var totalPages = 1
     private var activeQuery = ""

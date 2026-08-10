@@ -12,7 +12,8 @@ struct AskAIRoute: Hashable {
 }
 
 struct SearchPageView: View {
-    @StateObject private var viewModel = SearchViewModel()
+    
+    @State private var viewModel = SearchViewModel()
     @Namespace private var zoomNamespace
 
     var body: some View {

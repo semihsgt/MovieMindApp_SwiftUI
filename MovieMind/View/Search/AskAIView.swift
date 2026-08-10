@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AskAIView: View {
-    @StateObject private var viewModel = AskAIViewModel()
+    @State private var viewModel = AskAIViewModel()
     var initialQuery: String? = nil
 
     private let examples = [

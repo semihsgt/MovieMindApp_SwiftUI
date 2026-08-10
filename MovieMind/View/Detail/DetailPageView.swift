@@ -9,7 +9,7 @@ import SwiftUI
 import FluidHeader
 
 struct DetailPageView: View {
-    @StateObject private var viewModel = DetailPageViewModel()
+    @State private var viewModel = DetailPageViewModel()
     let id: Int
     let mediaType: MediaType
     

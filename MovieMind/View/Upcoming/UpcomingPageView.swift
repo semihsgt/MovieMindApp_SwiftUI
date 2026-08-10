@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct UpcomingPageView: View {
-    @StateObject private var viewModel = UpcomingPageViewModel()
+    
+    @State private var viewModel = UpcomingPageViewModel()
     @Namespace private var zoomNamespace
 
     var body: some View {
@@ -106,7 +107,7 @@ struct UpcomingPageView: View {
 
 private struct UpcomingCard: View {
     let item: UpcomingUIModel
-    
+
     var body: some View {
         ZStack {
             AsyncPoster(path: item.result.displayPath,
@@ -115,57 +116,57 @@ private struct UpcomingCard: View {
             .blur(radius: 20)
             .overlay(Color.black.opacity(0.3))
             .clipShape(RoundedRectangle(cornerRadius: 28))
-            
+
             HStack(spacing: 12) {
                 AsyncPoster(path: item.result.displayPath,
                             width: 100, height: 150,
                             size: .w200)
                 .padding(.leading)
                 .shadow(radius: 10)
-                
+
                 VStack(alignment: .leading, spacing: 8) {
                     Text(item.result.displayName)
                         .font(.system(size: 18, weight: .bold))
                         .multilineTextAlignment(.leading)
                         .lineLimit(2)
-                    
+
                     HStack(spacing: 6) {
                         let genres = Array(item.genreNames.prefix(2))
-                        
+
                         ForEach(genres, id: \.self) { genre in
                             Text(genre)
                                 .font(.subheadline)
                                 .foregroundStyle(.white.opacity(0.8))
                                 .lineLimit(1)
-                            
+
                             if genre != genres.last {
                                 Text("•")
                                     .foregroundStyle(.white.opacity(0.5))
                             }
                         }
                     }
-                    
+
                     if item.mediaType == .movie {
                         let formattedDate = item.result.releaseDate?.toDate()?.relativeReleaseString() ?? "Release date unknown"
-                        
+
                         Text(formattedDate)
                             .font(.subheadline)
                             .foregroundStyle(.white.opacity(0.8))
-                        
+
                     } else {
                         let formattedDate = item.result.firstAirDate?.toDate()?.relativeReleaseString() ?? "Release date unknown"
-                        
+
                         Text(formattedDate)
                             .font(.subheadline)
                             .foregroundStyle(.white.opacity(0.8))
                     }
-                    
+
                 }
                 .fontDesign(.rounded)
                 .padding(.vertical, 20)
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.right")
                     .padding(.trailing, 20)
             }

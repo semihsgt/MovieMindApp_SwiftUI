@@ -18,7 +18,7 @@ private let recommendationSeedDescriptor: FetchDescriptor<WatchlistItem> = {
 }()
 
 struct HomePageView: View {
-    @StateObject private var viewModel = HomePageViewModel()
+    @State private var viewModel = HomePageViewModel()
     @Namespace private var zoomNamespace
 
     @Query(recommendationSeedDescriptor) private var watchlist: [WatchlistItem]
@@ -72,7 +72,7 @@ struct HomePageView: View {
             await viewModel.refetchSection(.popular)
         }
     }
-    
+
     private func homeContent(_ heroItems: [HeroUIModel]) -> some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 0) {
@@ -131,7 +131,7 @@ struct HomePageView: View {
 
             HStack(spacing: 10) {
                 Spacer(minLength: 50)
-                
+
                 ForEach(0..<4, id: \.self) { _ in
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.white.opacity(0.08))
@@ -141,7 +141,7 @@ struct HomePageView: View {
             }
         }
         .padding(.horizontal)
-        
+
     }
 
     private var aiShortcutCard: some View {
@@ -192,7 +192,7 @@ struct HomePageView: View {
                         description: "What everyone is watching right now.",
                         data: viewModel.popularMT?.results,
                         mediaType: $viewModel.popularType)
-            
+
             SectionView(title: "Trending",
                         description: "The hottest titles today.",
                         data: viewModel.trendingMT?.results,
@@ -202,17 +202,17 @@ struct HomePageView: View {
                         description: "Highly acclaimed movies and shows.",
                         data: viewModel.topRatedMT?.results,
                         mediaType: $viewModel.topRatedType)
-            
+
             aiShortcutCard
-            
+
             SectionView(title: "Airing Today",
                         description: "Fresh TV episodes dropping today.",
                         data: viewModel.airingT?.results)
-            
+
             SectionView(title: "In Theatres",
                         description: "New movies playing near you right now.",
                         data: viewModel.nowPlayingM?.results)
-            
+
             SectionView(title: "Trending People",
                         description: "Most searched stars and creators this week.",
                         data: viewModel.popularP?.results)

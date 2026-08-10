@@ -7,36 +7,32 @@
 
 import Foundation
 import SwiftUI
-internal import Combine
 
 @MainActor
-final class DetailPageViewModel: ObservableObject {
-    
+@Observable
+final class DetailPageViewModel {
+
     private let networkService: NetworkServicing
-    
-    @Published private(set) var state: ViewState<HeroUIModel> = .idle
-    
+    private(set) var state: ViewState<HeroUIModel> = .idle
     private(set) var knownFor: [MediaItem]?
-    
     private(set) var movieDetail: MovieDetail?
     private(set) var tvDetail: TVDetail?
     private(set) var personDetail: PersonDetail?
     private(set) var similar: ListRespond?
     private(set) var watchProviders: CountryWatchProviders?
-    
     private var loadedKey: String?
-    
+
     init(networkService: NetworkServicing = NetworkManager.shared) {
         self.networkService = networkService
     }
-    
+
     func loadIfNeeded(id: Int, mediaType: MediaType) async {
         let key = "\(mediaType.rawValue)-\(id)"
         guard key != loadedKey else { return }
         loadedKey = key
         await load(id: id, mediaType: mediaType)
     }
-    
+
     func load(id: Int, mediaType: MediaType) async {
         state = .loading
 
@@ -53,7 +49,7 @@ final class DetailPageViewModel: ObservableObject {
         case .person: await loadPerson(id: id)
         }
     }
-    
+
     private static func topCredits(from credits: CombinedCredits?) -> [MediaItem]? {
         guard let cast = credits?.cast, !cast.isEmpty else { return nil }
         var seen = Set<Int>()
@@ -63,27 +59,27 @@ final class DetailPageViewModel: ObservableObject {
         }
         return Array(unique.sorted { ($0.popularity ?? 0) > ($1.popularity ?? 0) }.prefix(20))
     }
-    
-    
+
+
     private func loadMovie(id: Int) async {
         async let detail: MovieDetail = networkService.fetchDetails(id: id, for: .movie)
         async let images = try? networkService.fetchImages(id: id, for: .movie)
         async let similarList = try? networkService.fetchSimilar(id: id, for: .movie)
         async let providers = try? networkService.fetchWatchProviders(id: id, for: .movie)
-        
+
         do {
             let d = try await detail
             let (imagesR, similarR, providersR) = await (images, similarList, providers)
-            
+
             self.movieDetail = d
             self.similar = similarR?.stamping(.movie)
             self.watchProviders = Self.pickRegion(from: providersR)
-            
+
             guard let dId = d.id else {
                 state = .failed("Details could not be loaded.")
                 return
             }
-            
+
             let item = MediaItem(
                 id: dId,
                 mediaType: .movie,
@@ -109,7 +105,7 @@ final class DetailPageViewModel: ObservableObject {
                 profilePath: nil,
                 knownFor: nil
             )
-            
+
             let heroItem = HeroUIModel(
                 id: dId,
                 result: item,
@@ -137,20 +133,20 @@ final class DetailPageViewModel: ObservableObject {
         async let images = try? networkService.fetchImages(id: id, for: .tv)
         async let similarList = try? networkService.fetchSimilar(id: id, for: .tv)
         async let providers = try? networkService.fetchWatchProviders(id: id, for: .tv)
-        
+
         do {
             let d = try await detail
             let (imagesR, similarR, providersR) = await (images, similarList, providers)
-            
+
             self.tvDetail = d
             self.similar = similarR?.stamping(.tv)
             self.watchProviders = Self.pickRegion(from: providersR)
-            
+
             guard let dId = d.id else {
                 state = .failed("Details could not be loaded.")
                 return
             }
-            
+
             let item = MediaItem(
                 id: dId,
                 mediaType: .tv,
@@ -176,7 +172,7 @@ final class DetailPageViewModel: ObservableObject {
                 profilePath: nil,
                 knownFor: nil
             )
-            
+
             let heroItem = HeroUIModel(
                 id: dId,
                 result: item,
@@ -204,20 +200,20 @@ final class DetailPageViewModel: ObservableObject {
         async let detail: PersonDetail = networkService.fetchDetails(id: id, for: .person)
         async let images = try? networkService.fetchImages(id: id, for: .person)
         async let credits = try? networkService.fetchPersonCredits(id: id)
-        
+
         do {
             let d = try await detail
             let imagesR = await images
-            
+
             self.personDetail = d
             let creditsR = await credits
             self.knownFor = Self.topCredits(from: creditsR)
-            
+
             guard let dId = d.id else {
                 state = .failed("Details could not be loaded.")
                 return
             }
-            
+
             let item = MediaItem(
                 id: dId,
                 mediaType: .person,
@@ -243,7 +239,7 @@ final class DetailPageViewModel: ObservableObject {
                 profilePath: d.profilePath,
                 knownFor: nil
             )
-            
+
             let heroItem = HeroUIModel(
                 id: dId,
                 result: item,
@@ -260,8 +256,8 @@ final class DetailPageViewModel: ObservableObject {
             state = .failed(error.localizedDescription)
         }
     }
-    
-    
+
+
     private static func pickRegion(from response: WatchProviderResponse?) -> CountryWatchProviders? {
         guard let results = response?.results, !results.isEmpty else { return nil }
         let regionCode = Locale.current.region?.identifier ?? "US"

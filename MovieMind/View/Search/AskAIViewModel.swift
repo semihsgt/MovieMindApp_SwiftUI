@@ -6,10 +6,10 @@
 //
 
 import SwiftUI
-internal import Combine
 
 @MainActor
-final class AskAIViewModel: ObservableObject {
+@Observable
+final class AskAIViewModel {
 
     struct Message: Identifiable {
         enum Role {
@@ -23,10 +23,9 @@ final class AskAIViewModel: ObservableObject {
         var items: [MediaItem] = []
     }
 
-    @Published private(set) var messages: [Message] = []
-    @Published var input: String = ""
-    @Published private(set) var isResponding = false
-
+    private(set) var messages: [Message] = []
+    var input: String = ""
+    private(set) var isResponding = false
     private let chatService: AIChatService
 
     init(chatService: AIChatService = .shared) {

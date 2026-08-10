@@ -9,11 +9,11 @@ import Foundation
 import SwiftUI
 
 struct CollectionPageView: View {
-    @StateObject private var viewModel = CollectionViewModel()
+    @State private var viewModel = CollectionViewModel()
     let route: CollectionRoute
-    
+
     private let columns = [GridItem(.adaptive(minimum: 110), spacing: 12)]
-    
+
     var body: some View {
         StateContainerView(state: viewModel.state) {
             await viewModel.load(id: route.id)
@@ -25,7 +25,7 @@ struct CollectionPageView: View {
                             .font(.body)
                             .foregroundStyle(.secondary)
                     }
-                    
+
                     LazyVGrid(columns: columns, spacing: 16) {
                         ForEach(sortedParts(detail)) { item in
                             if let mediaRoute = MediaRoute(item: item) {
@@ -49,7 +49,7 @@ struct CollectionPageView: View {
             await viewModel.loadIfNeeded(id: route.id)
         }
     }
-    
+
     private func sortedParts(_ detail: CollectionDetail) -> [MediaItem] {
         (detail.parts ?? []).map { item -> MediaItem in
             var copy = item
