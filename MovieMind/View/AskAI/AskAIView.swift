@@ -195,31 +195,35 @@ private struct ChatBubble: View {
 }
 
 private struct TypingIndicator: View {
-    @State private var phase = 0.0
+    @State private var isBouncing = false
 
     var body: some View {
         HStack(spacing: 5) {
-            ForEach(0..<3) { index in
+            ForEach(0..<3, id: \.self) { index in
                 Circle()
                     .fill(.secondary)
                     .frame(width: 7, height: 7)
-                    .scaleEffect(scale(for: index))
+                    .scaleEffect(isBouncing ? 1 : 0.6)
+                    .opacity(isBouncing ? 1 : 0.4)
+                    .animation(
+                        .easeInOut(duration: 0.5)
+                            .repeatForever(autoreverses: true)
+                            .delay(Double(index) * 0.15),
+                        value: isBouncing
+                    )
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(Color(.secondarySystemBackground), in: .capsule)
-        .onAppear {
-            withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) {
-                phase = 1
-            }
-        }
+        .onAppear { isBouncing = true }
     }
+}
 
-    private func scale(for index: Int) -> CGFloat {
-        let offset = Double(index) * 0.2
-        return 0.6 + 0.4 * abs(sin((phase + offset) * .pi))
-    }
+#Preview("Typing Indicator") {
+    TypingIndicator()
+        .padding()
+        .background(Color.black)
 }
 
 #Preview {
