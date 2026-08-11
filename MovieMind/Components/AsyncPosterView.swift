@@ -19,9 +19,7 @@ struct AsyncPoster: View {
     var size: TMDBImage.Size = .w500
 
     private static let maxRetries = 2
-
-    @State private var retryCount = 0
-    @State private var reloadToken = UUID()
+    @State private var failedAttempts = 0
 
     private var url: URL? {
         TMDBImage.url(for: path, size: size)
@@ -52,15 +50,13 @@ struct AsyncPoster: View {
                             .aspectRatio(contentMode: contentMode)
                     } else if state.error != nil {
                         placeholderView
-                            .task {
-                                await retryIfPossible()
-                            }
+                            .task { await retryIfPossible() }
                     } else {
                         ProgressView()
                     }
                 }
                 .pipeline(.shared)
-                .id(reloadToken)
+                .id(failedAttempts)
             } else {
                 placeholderView
             }
@@ -68,17 +64,16 @@ struct AsyncPoster: View {
         .frame(width: width, height: height)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .onChange(of: path) {
-            retryCount = 0
-            reloadToken = UUID()
+            if failedAttempts != 0 { failedAttempts = 0 }
         }
     }
 
     private func retryIfPossible() async {
-        guard retryCount < Self.maxRetries else { return }
-        retryCount += 1
-        try? await Task.sleep(for: .seconds(Double(retryCount) * 1.2))
+        guard failedAttempts < Self.maxRetries else { return }
+        let nextAttempt = failedAttempts + 1
+        try? await Task.sleep(for: .seconds(Double(nextAttempt) * 1.2))
         guard !Task.isCancelled else { return }
-        reloadToken = UUID()
+        failedAttempts = nextAttempt
     }
 
     private var placeholderView: some View {
