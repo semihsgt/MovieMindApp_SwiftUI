@@ -11,7 +11,7 @@ import SwiftUI
 struct HeroUIModel: Identifiable {
     let id: Int
     let result: MediaItem
-    let images: Images?
+    var images: Images?
     let genreNames: [String]
 }
 
@@ -30,6 +30,8 @@ enum PickerSection {
 @MainActor
 @Observable
 final class HomePageViewModel {
+
+    private static let eagerHeroImageCount = 3
 
     private(set) var state: ViewState<[HeroUIModel]> = .idle
 
@@ -72,7 +74,10 @@ final class HomePageViewModel {
 
         do {
             try await fetchAllSections()
-            let heroItems = await buildHeroItems()
+
+            var heroItems = await buildHeroItems()
+            heroItems = await withHeroImages(heroItems, in: 0..<Self.eagerHeroImageCount)
+
             await prefetchPosterImages(heroItems: heroItems)
             withAnimation(.easeInOut(duration: 0.4)) {
                 state = .loaded(heroItems)
@@ -81,24 +86,15 @@ final class HomePageViewModel {
             if trendingType != .movie { await refetchSection(.trending) }
             if topRatedType != .movie { await refetchSection(.topRated) }
             if popularType != .movie { await refetchSection(.popular) }
+
+            await loadRemainingHeroImages()
         } catch {
             state = .failed(error.localizedDescription)
         }
     }
 
     private func prefetchPosterImages(heroItems: [HeroUIModel]) async {
-        var urls: [URL] = []
-
-        for item in heroItems {
-            let posterPath = item.images?.bestPoster ?? item.result.displayPath
-            if let url = TMDBImage.url(for: posterPath, size: .w780) {
-                urls.append(url)
-            }
-
-            if let logoURL = TMDBImage.url(for: item.images?.bestLogo(), size: .w500) {
-                urls.append(logoURL)
-            }
-        }
+        var urls = heroImageURLs(for: heroItems)
 
         for list in [nowPlayingM, trendingMT, topRatedMT, popularMT, airingT, popularP] {
             urls.append(contentsOf: posterURLs(in: list))
@@ -113,6 +109,23 @@ final class HomePageViewModel {
 
     private func posterURLs(in list: ListRespond?) -> [URL] {
         (list?.results ?? []).compactMap { TMDBImage.url(for: $0.displayPath, size: .w500) }
+    }
+
+    private func heroImageURLs(for items: [HeroUIModel]) -> [URL] {
+        var urls: [URL] = []
+
+        for item in items {
+            let posterPath = item.images?.bestPoster ?? item.result.displayPath
+            if let url = TMDBImage.url(for: posterPath, size: .w780) {
+                urls.append(url)
+            }
+
+            if let logoURL = TMDBImage.url(for: item.images?.bestLogo(), size: .w500) {
+                urls.append(logoURL)
+            }
+        }
+
+        return urls
     }
 
     private func fetchAllSections() async throws {
@@ -139,29 +152,53 @@ final class HomePageViewModel {
     private func buildHeroItems() async -> [HeroUIModel] {
         guard let results = trendingAll?.results else { return [] }
         let genreDictionary = await genreStore.genreDictionary()
-        var preparedItems: [HeroUIModel] = []
 
-        await withTaskGroup(of: HeroUIModel?.self) { group in
-            for item in results {
-                guard let id = item.id, let mediaType = item.mediaType else { continue }
-
-                group.addTask { [networkService] in
-                    let fetchedImages = try? await networkService.fetchImages(id: id, for: mediaType)
-                    let names = (item.genreIds ?? []).compactMap { genreDictionary[$0] }
-                    return HeroUIModel(id: id, result: item, images: fetchedImages, genreNames: names)
-                }
-            }
-
-            for await model in group {
-                if let model { preparedItems.append(model) }
-            }
-        }
-
-        return results.compactMap { original in
-            preparedItems.first(where: { $0.id == original.id })
+        return results.compactMap { item in
+            guard let id = item.id, item.mediaType != nil else { return nil }
+            let names = (item.genreIds ?? []).compactMap { genreDictionary[$0] }
+            return HeroUIModel(id: id, result: item, images: nil, genreNames: names)
         }
     }
 
+    private func withHeroImages(_ items: [HeroUIModel], in range: Range<Int>) async -> [HeroUIModel] {
+        let window = range.clamped(to: items.indices)
+        guard !window.isEmpty else { return items }
+
+        var updated = items
+
+        await withTaskGroup(of: (Int, Images?).self) { group in
+            for index in window {
+                let item = items[index]
+                guard item.images == nil, let mediaType = item.result.mediaType else { continue }
+                let id = item.id
+
+                group.addTask { [networkService] in
+                    (index, try? await networkService.fetchImages(id: id, for: mediaType))
+                }
+            }
+
+            for await (index, images) in group {
+                if let images { updated[index].images = images }
+            }
+        }
+
+        return updated
+    }
+
+    private func loadRemainingHeroImages() async {
+        guard let items = state.value, items.count > Self.eagerHeroImageCount else { return }
+
+        let updated = await withHeroImages(items, in: Self.eagerHeroImageCount..<items.count)
+
+        guard !Task.isCancelled,
+              let current = state.value,
+              current.map(\.id) == items.map(\.id) else { return }
+
+        state = .loaded(updated)
+        await ImagePrefetching.prefetch(
+            heroImageURLs(for: Array(updated.dropFirst(Self.eagerHeroImageCount)))
+        )
+    }
 
     func loadRecommendations(seeds: [LibrarySeed]) async {
         guard !seeds.isEmpty else {
