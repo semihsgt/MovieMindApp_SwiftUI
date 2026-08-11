@@ -6,32 +6,21 @@
 //
 
 import SwiftUI
+import Nuke
+import NukeUI
 
 struct HeroCard: View {
+    
     let item: HeroUIModel
     let isButtonDisplayed: Bool
-
-    init(item: HeroUIModel, isButtonDisplayed: Bool = true) {
-        self.item = item
-        self.isButtonDisplayed = isButtonDisplayed
-    }
-
-    private var mediaType: MediaType? {
-        item.result.mediaType
-    }
-
-    private var posterPath: String? {
-        item.images?.bestPoster ?? item.result.displayPath
-    }
-
-    private var logoPath: String? {
-        item.images?.bestLogo()
-    }
-
-    private var shouldShowTitle: Bool {
-        mediaType == .person || posterPath != item.result.displayPath
-    }
-
+    
+    private var mediaType: MediaType? { item.result.mediaType }
+    private var posterPath: String? { item.images?.bestPoster ?? item.result.displayPath }
+    private var logoPath: String? { item.images?.bestLogo() }
+    
+    private var logoMaxWidth: CGFloat { isButtonDisplayed ? 260 : 350 }
+    private var logoMaxHeight: CGFloat { isButtonDisplayed ? 90 : 120 }
+    
     private var mediaTypeLabel: String {
         switch mediaType {
         case .person: return "Person"
@@ -39,6 +28,11 @@ struct HeroCard: View {
         case .movie: return "Movie"
         case .none: return ""
         }
+    }
+
+    init(item: HeroUIModel, isButtonDisplayed: Bool = true) {
+        self.item = item
+        self.isButtonDisplayed = isButtonDisplayed
     }
 
     var body: some View {
@@ -57,13 +51,12 @@ struct HeroCard: View {
             )
 
             if isButtonDisplayed {
+                
                 VStack(spacing: 0) {
                     Spacer()
 
-                    if shouldShowTitle {
-                        titleView
-                            .padding(.bottom, 8)
-                    }
+                    titleView
+                        .padding(.bottom, 8)
 
                     subtitleView
                         .shadow(radius: 10)
@@ -77,54 +70,46 @@ struct HeroCard: View {
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 30)
-            } else {
-                if shouldShowTitle {
-                    VStack(spacing: 0) {
-                        Spacer()
-                        titleView
-                            .padding(.vertical)
-                    }
+                
+            } else if mediaType != .person {
+                
+                VStack(spacing: 0) {
+                    Spacer()
+                    titleView
+                        .padding(.vertical)
                 }
+                
             }
         }
         .aspectRatio(2/3, contentMode: .fit)
-        .background {
-            backgroundImageView
-        }
+        .background { backgroundImageView }
         .clipped()
     }
 
     @ViewBuilder
     private var backgroundImageView: some View {
-        if let path = posterPath {
-            AsyncPoster(path: path, contentMode: .fill, cornerRadius: 0, size: .w780)
+        if let posterPath {
+            AsyncPoster(path: posterPath, contentMode: .fill, cornerRadius: 0, size: .w780)
         } else {
-            Rectangle()
-                .fill(Color.black.opacity(0.8))
+            Rectangle().fill(Color.black.opacity(0.8))
         }
     }
-
 
     @ViewBuilder
     private var titleView: some View {
         if let url = TMDBImage.url(for: logoPath, size: .w500) {
-            AsyncImage(url: url) { phase in
-                switch phase {
-                case .success(let image):
+            LazyImage(url: url) { state in
+                if let image = state.image {
                     image
                         .resizable()
                         .scaledToFit()
-                        .frame(maxWidth: isButtonDisplayed ? 260 : 350,
-                               maxHeight: isButtonDisplayed ? 90 : 120)
+                        .frame(maxWidth: logoMaxWidth, maxHeight: logoMaxHeight)
                         .shadow(radius: 10)
-                case .empty:
-                    EmptyView()
-                case .failure:
-                    fallbackTitleView
-                @unknown default:
+                } else if state.error != nil {
                     fallbackTitleView
                 }
             }
+            .pipeline(.shared)
         } else {
             fallbackTitleView
         }
@@ -186,7 +171,7 @@ struct HeroCard: View {
 
     private var actionButtonsView: some View {
         HStack(spacing: 12) {
-            NavigationLink(value: MediaRoute(id: item.id, mediaType: item.result.mediaType ?? .movie)) {
+            NavigationLink(value: MediaRoute(id: item.id, mediaType: mediaType ?? .movie)) {
                 HStack {
                     Image(systemName: "info.circle")
                     Text("More Info")
@@ -199,7 +184,7 @@ struct HeroCard: View {
 
             LibraryButton(
                 mediaId: item.id,
-                mediaType: item.result.mediaType ?? .movie,
+                mediaType: mediaType ?? .movie,
                 displayName: item.result.displayName,
                 posterPath: item.result.displayPath,
                 showsBackground: true

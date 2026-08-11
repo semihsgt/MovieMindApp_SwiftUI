@@ -19,6 +19,7 @@ struct LibraryButton: View {
     private let posterPath: String?
     private let diameter: CGFloat
     private let showsBackground: Bool
+    private var isSaved: Bool { !savedItems.isEmpty }
 
     init(mediaId: Int,
          mediaType: MediaType,
@@ -40,8 +41,6 @@ struct LibraryButton: View {
         descriptor.fetchLimit = 1
         _savedItems = Query(descriptor)
     }
-
-    private var isSaved: Bool { !savedItems.isEmpty }
 
     var body: some View {
         Button {

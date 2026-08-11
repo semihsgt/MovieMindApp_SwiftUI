@@ -23,8 +23,8 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				App/Info.plist,
-				Networking/Secrets.xcconfig,
-				Networking/SecretsExample.xcconfig,
+				Core/Networking/Secrets.xcconfig,
+				Core/Networking/SecretsExample.xcconfig,
 			);
 			target = 3753F67F2FFC9DB700DC7E17 /* MovieMind */;
 		};
@@ -161,7 +161,7 @@
 		3753F6892FFC9DB800DC7E17 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 37AFAD20300D17EA00DE6B31 /* MovieMind */;
-			baseConfigurationReferenceRelativePath = Networking/Secrets.xcconfig;
+			baseConfigurationReferenceRelativePath = Core/Networking/Secrets.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -197,7 +197,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -205,7 +205,7 @@
 		3753F68A2FFC9DB800DC7E17 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 37AFAD20300D17EA00DE6B31 /* MovieMind */;
-			baseConfigurationReferenceRelativePath = Networking/Secrets.xcconfig;
+			baseConfigurationReferenceRelativePath = Core/Networking/Secrets.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -241,7 +241,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
@@ -249,7 +249,7 @@
 		3791FC5A2FEC5DE70005CBA4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 37AFAD20300D17EA00DE6B31 /* MovieMind */;
-			baseConfigurationReferenceRelativePath = Networking/Secrets.xcconfig;
+			baseConfigurationReferenceRelativePath = Core/Networking/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -316,7 +316,7 @@
 		3791FC5B2FEC5DE70005CBA4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 37AFAD20300D17EA00DE6B31 /* MovieMind */;
-			baseConfigurationReferenceRelativePath = Networking/Secrets.xcconfig;
+			baseConfigurationReferenceRelativePath = Core/Networking/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;

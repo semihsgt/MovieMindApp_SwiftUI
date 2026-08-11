@@ -50,8 +50,8 @@ Views (SwiftUI) ──▶ ViewModels (@MainActor, @Observable)
                          │  ViewState<T>
               ┌──────────┴───────────┐
               ▼                      ▼
-   NetworkServicing          AIServicing (protocol)
-      (protocol)                     │
+  ListServicing, etc.        AIServicing (protocol)
+   (per-use-case)                    │
          │                           ▼
          ▼                   GeminiService (actor)
   NetworkManager (actor)      Gemini generateContent
@@ -60,12 +60,20 @@ Views (SwiftUI) ──▶ ViewModels (@MainActor, @Observable)
 
 ```
 MovieMind/
-├── App/           Entry point, tab bar, assets
-├── Components/    Reusable views (HeroCard, AsyncPoster, SectionView, shimmer, …)
-├── Extensions/    Date/String helpers, ZoomTransition
-├── Models/        Codable domain models (media, details, credits, shared)
-├── Networking/    Endpoints, NetworkManager, GenreStore, GeminiService, AI services
-└── View/          Feature screens (Home, Detail, Search + Ask AI, Upcoming, Library, Collection)
+├── App/             Entry point, tab bar, splash, assets
+├── Core/            Feature-agnostic infrastructure
+│   ├── Networking/  Endpoints, NetworkManager, per-use-case service protocols, secrets
+│   ├── AI/          Gemini client, JSON schema, chat & recommendation services
+│   ├── Images/      TMDB image URLs, Nuke-backed prefetching
+│   ├── Persistence/ SwiftData model
+│   └── Extensions/  Date/String helpers
+├── Models/
+│   ├── API/         Codable TMDB responses
+│   └── UI/          Presentation models + mappers
+├── Navigation/      Route types, zoom transition
+├── Components/      Reusable views (HeroCard, AsyncPoster, SectionView, ViewState, …)
+├── Features/        One folder per screen: view + view model + its own subviews
+└── PreviewContent/  Fixtures for SwiftUI previews
 ```
 
 ### Key decisions
@@ -94,7 +102,7 @@ MovieMind/
 
 1. Clone the repo
 2. Get a free API key from [TMDB](https://developer.themoviedb.org/docs/getting-started) *(Required)* and [Google AI Studio](https://ai.google.dev/gemini-api/docs/api-key#import-projects) *(Optional)*
-4. Copy `SecretsExample.xcconfig` → `Secrets.xcconfig` and add your keys:
+4. Copy `Core/Networking/SecretsExample.xcconfig` → `Secrets.xcconfig` and add your keys:
    ```
    TMDB_API_KEY = your_tmdb_key_here
    GEMINI_API_KEY = your_gemini_key_here

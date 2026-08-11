@@ -11,6 +11,7 @@ import Nuke
 import NukeUI
 
 struct AsyncPoster: View {
+    
     let path: String?
     var width: CGFloat? = nil
     var height: CGFloat? = nil
@@ -21,25 +22,6 @@ struct AsyncPoster: View {
     private static let maxRetries = 2
     @State private var failedAttempts = 0
 
-    private var url: URL? {
-        TMDBImage.url(for: path, size: size)
-    }
-
-    private var request: ImageRequest? {
-        guard let url else { return nil }
-
-        let targetSize = CGSize(
-            width: width ?? UIScreen.main.bounds.width,
-            height: height ?? UIScreen.main.bounds.height
-        )
-        let resizeMode: ImageProcessingOptions.ContentMode = contentMode == .fill ? .aspectFill : .aspectFit
-        let processors: [any ImageProcessing] = [
-            ImageProcessors.Resize(size: targetSize, unit: .points, contentMode: resizeMode)
-        ]
-
-        return ImageRequest(url: url, processors: processors)
-    }
-
     var body: some View {
         Group {
             if let request {
@@ -49,7 +31,7 @@ struct AsyncPoster: View {
                             .resizable()
                             .aspectRatio(contentMode: contentMode)
                     } else if state.error != nil {
-                        placeholderView
+                        placeholder
                             .task { await retryIfPossible() }
                     } else {
                         ProgressView()
@@ -58,7 +40,7 @@ struct AsyncPoster: View {
                 .pipeline(.shared)
                 .id(failedAttempts)
             } else {
-                placeholderView
+                placeholder
             }
         }
         .frame(width: width, height: height)
@@ -67,16 +49,29 @@ struct AsyncPoster: View {
             if failedAttempts != 0 { failedAttempts = 0 }
         }
     }
+    
+    /// Decodes at the on-screen size rather than the downloaded size.
+    private var request: ImageRequest? {
+        guard let url = TMDBImage.url(for: path, size: size) else { return nil }
+
+        let targetSize = CGSize(width: width ?? UIScreen.main.bounds.width,
+                                height: height ?? UIScreen.main.bounds.height)
+        let resizeMode: ImageProcessingOptions.ContentMode = contentMode == .fill ? .aspectFill : .aspectFit
+
+        return ImageRequest(url: url,
+                            processors: [ImageProcessors.Resize(size: targetSize, unit: .points, contentMode: resizeMode)])
+    }
 
     private func retryIfPossible() async {
         guard failedAttempts < Self.maxRetries else { return }
+
         let nextAttempt = failedAttempts + 1
         try? await Task.sleep(for: .seconds(Double(nextAttempt) * 1.2))
         guard !Task.isCancelled else { return }
         failedAttempts = nextAttempt
     }
 
-    private var placeholderView: some View {
+    private var placeholder: some View {
         ZStack {
             Rectangle()
                 .fill(.gray.opacity(0.25))

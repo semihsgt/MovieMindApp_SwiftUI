@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SectionView: View {
+    
     let title: String
     let description: String
     let data: [MediaItem]?

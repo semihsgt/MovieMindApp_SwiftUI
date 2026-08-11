@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ShimmerModifier: ViewModifier {
+    
     @State private var phase: CGFloat = -0.3
 
     func body(content: Content) -> some View {
@@ -23,27 +24,21 @@ struct ShimmerModifier: ViewModifier {
                     .frame(width: width * 0.6)
                     .offset(x: phase * width * 2)
                 }
-                .mask(content)
+                    .mask(content)
             )
             .onAppear {
-                withAnimation(.linear(duration: 1.3).repeatForever(autoreverses: false)) {
-                    phase = 1
-                }
+                withAnimation(.linear(duration: 1.3).repeatForever(autoreverses: false)) { phase = 1 }
             }
     }
 }
 
 extension View {
-    func shimmer() -> some View {
-        modifier(ShimmerModifier())
-    }
+    func shimmer() -> some View { modifier(ShimmerModifier()) }
 }
 
 #Preview {
     RoundedRectangle(cornerRadius: 16)
         .fill(Color.white.opacity(0.1))
-        .frame(width: 100, height: 150)
+        .frame(width: 300, height: 500)
         .shimmer()
-        .padding()
-        .background(Color.black)
 }
