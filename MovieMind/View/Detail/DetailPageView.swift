@@ -41,7 +41,9 @@ struct DetailPageView: View {
         .task(id: "\(mediaType.rawValue)-\(id)") {
             await viewModel.loadIfNeeded(id: id, mediaType: mediaType)
         }
-
+        .onDisappear {
+            viewModel.cancelPrefetching()
+        }
     }
 
     private func detailScrollContent(for item: HeroUIModel) -> some View {

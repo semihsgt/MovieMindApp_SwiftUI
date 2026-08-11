@@ -100,11 +100,11 @@ final class HomePageViewModel {
             urls.append(contentsOf: posterURLs(in: list))
         }
 
-        await ImagePrefetching.prefetch(urls)
+        await ImagePrefetching.shared.prefetch(urls)
     }
 
     private func prefetchPosterImages(for list: ListRespond) async {
-        await ImagePrefetching.prefetch(posterURLs(in: list))
+        await ImagePrefetching.shared.prefetch(posterURLs(in: list))
     }
 
     private func posterURLs(in list: ListRespond?) -> [URL] {
@@ -195,7 +195,7 @@ final class HomePageViewModel {
               current.map(\.id) == items.map(\.id) else { return }
 
         state = .loaded(updated)
-        await ImagePrefetching.prefetch(
+        await ImagePrefetching.shared.prefetch(
             heroImageURLs(for: Array(updated.dropFirst(Self.eagerHeroImageCount)))
         )
     }

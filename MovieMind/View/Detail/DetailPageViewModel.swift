@@ -13,6 +13,9 @@ import SwiftUI
 final class DetailPageViewModel {
 
     private let networkService: NetworkServicing
+
+    private let prefetcher = ImagePrefetching()
+
     private(set) var state: ViewState<HeroUIModel> = .idle
     private(set) var knownFor: [MediaItem]?
     private(set) var movieDetail: MovieDetail?
@@ -33,8 +36,14 @@ final class DetailPageViewModel {
         await load(id: id, mediaType: mediaType)
     }
 
+    func cancelPrefetching() {
+        prefetcher.cancelAll()
+    }
+
     func load(id: Int, mediaType: MediaType) async {
         state = .loading
+
+        prefetcher.cancelAll()
 
         movieDetail = nil
         tvDetail = nil
@@ -294,11 +303,8 @@ final class DetailPageViewModel {
         restURLs.append(contentsOf: (similar?.results ?? []).compactMap { TMDBImage.url(for: $0.displayPath, size: .w500) })
         restURLs.append(contentsOf: providerImageURLs(from: watchProviders))
 
-        await ImagePrefetching.prefetch(heroURLs)
-
-        Task {
-            await ImagePrefetching.prefetch(restURLs)
-        }
+        await prefetcher.prefetch(heroURLs)
+        await prefetcher.prefetch(restURLs)
     }
 
     private func providerImageURLs(from providers: CountryWatchProviders?) -> [URL] {

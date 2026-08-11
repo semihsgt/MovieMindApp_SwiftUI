@@ -160,10 +160,19 @@ enum TMDBImage {
     }
 }
 
-enum ImagePrefetching {
-    private static let prefetcher = Nuke.ImagePrefetcher(destination: .diskCache)
+final class ImagePrefetching: @unchecked Sendable {
 
-    static func prefetch(_ urls: [URL]) async {
+    static let shared = ImagePrefetching()
+
+    private let prefetcher = Nuke.ImagePrefetcher(destination: .diskCache)
+
+    init() {}
+
+    func prefetch(_ urls: [URL]) async {
         prefetcher.startPrefetching(with: Array(Set(urls)))
+    }
+
+    func cancelAll() {
+        prefetcher.stopPrefetching()
     }
 }

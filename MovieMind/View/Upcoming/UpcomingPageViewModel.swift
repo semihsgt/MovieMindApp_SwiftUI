@@ -75,6 +75,6 @@ final class UpcomingPageViewModel {
 
     private func prefetchPosterImages(for items: [UpcomingUIModel]) async {
         let urls = items.compactMap { TMDBImage.url(for: $0.result.displayPath, size: .w500) }
-        await ImagePrefetching.prefetch(urls)
+        await ImagePrefetching.shared.prefetch(urls)
     }
 }
