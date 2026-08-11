@@ -1,5 +1,5 @@
 //
-//  HomePageViewModel.swift
+//  HomeViewModel.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 25.06.2026.
@@ -22,7 +22,7 @@ enum PickerSection {
 
 @MainActor
 @Observable
-final class HomePageViewModel {
+final class HomeViewModel {
 
     /// Hero cards whose images are fetched before Home is shown.
     private static let eagerHeroImageCount = 3

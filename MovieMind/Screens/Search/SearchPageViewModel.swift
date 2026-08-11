@@ -1,5 +1,5 @@
 //
-//  SearchPageViewModel.swift
+//  SearchViewModel.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 30.06.2026.

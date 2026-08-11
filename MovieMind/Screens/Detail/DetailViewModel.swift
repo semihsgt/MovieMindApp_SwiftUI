@@ -1,5 +1,5 @@
 //
-//  DetailPageViewModel.swift
+//  DetailViewModel.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 6.07.2026.
@@ -10,7 +10,7 @@ import SwiftUI
 
 @MainActor
 @Observable
-final class DetailPageViewModel {
+final class DetailViewModel {
 
     private(set) var state: ViewState<HeroUIModel> = .idle
     private(set) var knownFor: [MediaItem]?

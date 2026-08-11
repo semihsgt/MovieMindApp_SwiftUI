@@ -1,5 +1,5 @@
 //
-//  HomePageView.swift
+//  HomeView.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 25.06.2026.
@@ -17,9 +17,9 @@ private let recommendationSeedDescriptor: FetchDescriptor<LibraryItem> = {
     return descriptor
 }()
 
-struct HomePageView: View {
+struct HomeView: View {
     
-    @State private var viewModel = HomePageViewModel()
+    @State private var viewModel = HomeViewModel()
     @State private var recommendations = HomeRecommendationsViewModel()
     @Namespace private var zoomNamespace
 
@@ -44,11 +44,11 @@ struct HomePageView: View {
             }
             .navigationTitle("Home")
             .navigationDestination(for: MediaRoute.self) { route in
-                DetailPageView(id: route.id, mediaType: route.mediaType)
+                DetailView(id: route.id, mediaType: route.mediaType)
                     .zoomDestination(id: route, in: zoomNamespace)
             }
             .navigationDestination(for: CollectionRoute.self) { route in
-                CollectionPageView(route: route)
+                CollectionView(route: route)
                     .zoomDestination(id: route, in: zoomNamespace)
             }
             .navigationDestination(for: AskAIRoute.self) { route in
@@ -193,6 +193,6 @@ struct HomePageView: View {
 }
 
 #Preview {
-    HomePageView()
+    HomeView()
         .modelContainer(for: LibraryItem.self, inMemory: true)
 }

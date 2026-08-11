@@ -1,5 +1,5 @@
 //
-//  UpcomingPageView.swift
+//  UpcomingView.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 25.06.2026.
@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct UpcomingPageView: View {
+struct UpcomingView: View {
 
-    @State private var viewModel = UpcomingPageViewModel()
+    @State private var viewModel = UpcomingViewModel()
     @Namespace private var zoomNamespace
 
     var body: some View {
@@ -26,11 +26,11 @@ struct UpcomingPageView: View {
             }
             .navigationTitle("Upcoming Media")
             .navigationDestination(for: MediaRoute.self) { route in
-                DetailPageView(id: route.id, mediaType: route.mediaType)
+                DetailView(id: route.id, mediaType: route.mediaType)
                     .zoomDestination(id: route, in: zoomNamespace)
             }
             .navigationDestination(for: CollectionRoute.self) { route in
-                CollectionPageView(route: route)
+                CollectionView(route: route)
                     .zoomDestination(id: route, in: zoomNamespace)
             }
         }
@@ -179,5 +179,5 @@ private struct UpcomingCard: View {
 }
 
 #Preview {
-    UpcomingPageView()
+    UpcomingView()
 }

@@ -1,5 +1,5 @@
 //
-//  UpcomingPageViewModel.swift
+//  UpcomingViewModel.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 28.06.2026.
@@ -10,7 +10,7 @@ import SwiftUI
 
 @MainActor
 @Observable
-final class UpcomingPageViewModel {
+final class UpcomingViewModel {
 
     private(set) var state: ViewState<[UpcomingUIModel]> = .idle
 

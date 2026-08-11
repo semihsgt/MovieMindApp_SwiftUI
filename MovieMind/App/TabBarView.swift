@@ -29,13 +29,13 @@ struct TabBarView: View {
     
     private var TabBarsView: some View {
         TabView {
-            HomePageView()
+            HomeView()
                 .tabItem { Label("Home", systemImage: "house") }
-            UpcomingPageView()
+            UpcomingView()
                 .tabItem { Label("Upcoming", systemImage: "clock") }
-            LibraryPageView()
+            LibraryView()
                 .tabItem { Label("Library", systemImage: "rectangle.stack") }
-            SearchPageView()
+            SearchView()
                 .tabItem { Label("Search", systemImage: "magnifyingglass") }
         }
     }

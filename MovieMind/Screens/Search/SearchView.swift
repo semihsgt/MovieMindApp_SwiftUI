@@ -1,5 +1,5 @@
 //
-//  SearchPageView.swift
+//  SearchView.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 25.06.2026.
@@ -11,7 +11,7 @@ struct AskAIRoute: Hashable {
     let query: String
 }
 
-struct SearchPageView: View {
+struct SearchView: View {
     
     @State private var viewModel = SearchViewModel()
     @Namespace private var zoomNamespace
@@ -51,11 +51,11 @@ struct SearchPageView: View {
                 prompt: "Movies, TV Shows, People..."
             )
             .navigationDestination(for: MediaRoute.self) { route in
-                DetailPageView(id: route.id, mediaType: route.mediaType)
+                DetailView(id: route.id, mediaType: route.mediaType)
                     .zoomDestination(id: route, in: zoomNamespace)
             }
             .navigationDestination(for: CollectionRoute.self) { route in
-                CollectionPageView(route: route)
+                CollectionView(route: route)
                     .zoomDestination(id: route, in: zoomNamespace)
             }
             .navigationDestination(for: AskAIRoute.self) { route in
@@ -200,5 +200,5 @@ struct SearchRowView: View {
 }
 
 #Preview {
-    SearchPageView()
+    SearchView()
 }

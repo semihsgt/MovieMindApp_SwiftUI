@@ -1,5 +1,5 @@
 //
-//  CollectionPageView.swift
+//  CollectionView.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 7.07.2026.
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct CollectionPageView: View {
+struct CollectionView: View {
     
     @State private var viewModel = CollectionViewModel()
     let route: CollectionRoute

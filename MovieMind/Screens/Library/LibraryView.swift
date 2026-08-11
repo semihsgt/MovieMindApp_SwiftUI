@@ -1,5 +1,5 @@
 //
-//  LibraryPageView.swift
+//  LibraryView.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 25.06.2026.
@@ -16,7 +16,7 @@ private let recentlyAddedDescriptor: FetchDescriptor<LibraryItem> = {
     return descriptor
 }()
 
-struct LibraryPageView: View {
+struct LibraryView: View {
 
     @Query(recentlyAddedDescriptor) private var items: [LibraryItem]
     @Namespace private var zoomNamespace
@@ -39,14 +39,14 @@ struct LibraryPageView: View {
             }
             .navigationTitle("Library")
             .navigationDestination(for: MediaRoute.self) { route in
-                DetailPageView(id: route.id, mediaType: route.mediaType)
+                DetailView(id: route.id, mediaType: route.mediaType)
                     .zoomDestination(id: route, in: zoomNamespace)
             }
             .navigationDestination(for: LibraryRoute.self) { route in
                 LibraryListView(filter: route.filter, title: route.title)
             }
             .navigationDestination(for: CollectionRoute.self) { route in
-                CollectionPageView(route: route)
+                CollectionView(route: route)
                     .zoomDestination(id: route, in: zoomNamespace)
             }
         }
@@ -94,6 +94,6 @@ struct LibraryPageView: View {
 }
 
 #Preview {
-    LibraryPageView()
+    LibraryView()
         .modelContainer(for: LibraryItem.self, inMemory: true)
 }

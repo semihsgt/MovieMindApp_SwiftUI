@@ -194,7 +194,7 @@ struct HeroCard: View {
 }
 
 #Preview("Home Page") {
-    HomePageView()
+    HomeView()
 }
 
 #Preview("Hero Cards") {

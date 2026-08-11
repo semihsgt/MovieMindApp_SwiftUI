@@ -90,5 +90,5 @@ struct SectionView: View {
 }
 
 #Preview {
-    HomePageView()
+    HomeView()
 }

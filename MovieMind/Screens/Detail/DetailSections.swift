@@ -336,5 +336,5 @@ struct CastSection: View {
 }
 
 #Preview {
-    DetailPageView(id: 640146, mediaType: .movie)
+    DetailView(id: 640146, mediaType: .movie)
 }

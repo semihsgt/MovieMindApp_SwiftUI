@@ -84,5 +84,5 @@ struct AsyncPoster: View {
 }
 
 #Preview {
-    HomePageView()
+    HomeView()
 }

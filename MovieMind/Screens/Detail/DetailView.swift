@@ -1,5 +1,5 @@
 //
-//  DetailPageView.swift
+//  DetailView.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 6.07.2026.
@@ -8,9 +8,9 @@
 import SwiftUI
 import FluidHeader
 
-struct DetailPageView: View {
+struct DetailView: View {
     
-    @State private var viewModel = DetailPageViewModel()
+    @State private var viewModel = DetailViewModel()
     let id: Int
     let mediaType: MediaType
 
@@ -201,24 +201,24 @@ struct DetailPageView: View {
 
 #Preview("Movie") {
     NavigationStack {
-        DetailPageView(id: 693134, mediaType: .movie)
+        DetailView(id: 693134, mediaType: .movie)
     }
 }
 
 #Preview("TV") {
     NavigationStack {
-        DetailPageView(id: 100088, mediaType: .tv)
+        DetailView(id: 100088, mediaType: .tv)
     }
 }
 
 #Preview("Person") {
     NavigationStack {
-        DetailPageView(id: 1356210, mediaType: .person)
+        DetailView(id: 1356210, mediaType: .person)
     }
 }
 
 #Preview("Invalid ID") {
     NavigationStack {
-        DetailPageView(id: 1353344343, mediaType: .movie)
+        DetailView(id: 1353344343, mediaType: .movie)
     }
 }
