@@ -21,7 +21,10 @@ final class AskAIViewModel {
         let role: Role
         let text: String
         var items: [MediaItem] = []
+        var isNotice = false
     }
+
+    private static let historyWindow = 10
 
     private(set) var messages: [Message] = []
     var input: String = ""
@@ -45,12 +48,8 @@ final class AskAIViewModel {
         isResponding = true
         defer { isResponding = false }
 
-        let history = messages.map {
-            AIChatTurn(role: $0.role == .user ? .user : .model, text: $0.text)
-        }
-
         do {
-            let result = try await chatService.send(history: history)
+            let result = try await chatService.send(history: conversationHistory)
             messages.append(Message(role: .assistant, text: result.reply, items: result.items))
         } catch {
             let message: String
@@ -62,7 +61,21 @@ final class AskAIViewModel {
             default:
                 message = "I couldn't respond just now. Please try again."
             }
-            messages.append(Message(role: .assistant, text: message))
+            messages.append(Message(role: .assistant, text: message, isNotice: true))
+        }
+    }
+
+    private var conversationHistory: [AIChatTurn] {
+        var window = messages
+            .filter { !$0.isNotice }
+            .suffix(Self.historyWindow)
+
+        while window.first?.role == .assistant {
+            window.removeFirst()
+        }
+
+        return window.map {
+            AIChatTurn(role: $0.role == .user ? .user : .model, text: $0.text)
         }
     }
 }
