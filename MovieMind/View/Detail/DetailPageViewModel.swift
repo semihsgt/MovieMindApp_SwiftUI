@@ -294,10 +294,10 @@ final class DetailPageViewModel {
         restURLs.append(contentsOf: (similar?.results ?? []).compactMap { TMDBImage.url(for: $0.displayPath, size: .w500) })
         restURLs.append(contentsOf: providerImageURLs(from: watchProviders))
 
-        await ImagePrefetcher.prefetch(heroURLs)
+        await ImagePrefetching.prefetch(heroURLs)
 
         Task {
-            await ImagePrefetcher.prefetch(restURLs)
+            await ImagePrefetching.prefetch(restURLs)
         }
     }
 

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct UpcomingPageView: View {
-    
+
     @State private var viewModel = UpcomingPageViewModel()
     @Namespace private var zoomNamespace
 
@@ -120,7 +120,7 @@ private struct UpcomingCard: View {
             HStack(spacing: 12) {
                 AsyncPoster(path: item.result.displayPath,
                             width: 100, height: 150,
-                            size: .w200)
+                            size: .w500)
                 .padding(.leading)
                 .shadow(radius: 10)
 

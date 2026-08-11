@@ -74,18 +74,7 @@ final class UpcomingPageViewModel {
     }
 
     private func prefetchPosterImages(for items: [UpcomingUIModel]) async {
-        var urls: [URL] = []
-
-        for item in items {
-            let path = item.result.displayPath
-            if let large = TMDBImage.url(for: path, size: .w500) {
-                urls.append(large)
-            }
-            if let small = TMDBImage.url(for: path, size: .w200) {
-                urls.append(small)
-            }
-        }
-
-        await ImagePrefetcher.prefetch(urls)
+        let urls = items.compactMap { TMDBImage.url(for: $0.result.displayPath, size: .w500) }
+        await ImagePrefetching.prefetch(urls)
     }
 }

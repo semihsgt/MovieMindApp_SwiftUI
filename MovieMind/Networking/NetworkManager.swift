@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Nuke
 
 protocol NetworkServicing: Sendable {
     func fetchList(for endpoint: ListEndpoint) async throws -> ListRespond
@@ -159,14 +160,10 @@ enum TMDBImage {
     }
 }
 
-enum ImagePrefetcher {
+enum ImagePrefetching {
+    private static let prefetcher = Nuke.ImagePrefetcher(destination: .diskCache)
+
     static func prefetch(_ urls: [URL]) async {
-        await withTaskGroup(of: Void.self) { group in
-            for url in Set(urls) {
-                group.addTask {
-                    _ = try? await URLSession.shared.data(from: url)
-                }
-            }
-        }
+        prefetcher.startPrefetching(with: Array(Set(urls)))
     }
 }

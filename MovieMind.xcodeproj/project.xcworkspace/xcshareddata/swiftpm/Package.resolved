@@ -1,5 +1,5 @@
 {
-  "originHash" : "a9803c3cc67697e2ef2a0ad70b5a23e755bad78cae9cfe46e87841a88797db21",
+  "originHash" : "e3241aa145ae07632ee5dc6803e0be19e09e57f56574b502edbcd4eaa82a3e57",
   "pins" : [
     {
       "identity" : "fluidheader",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "2bc96ebdb456b9b721f370b3d0c57c93a79ea599",
         "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "nuke",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kean/Nuke.git",
+      "state" : {
+        "revision" : "83e19143355b02e9261edb2323b3e1e93287ebb9",
+        "version" : "12.9.0"
       }
     }
   ],

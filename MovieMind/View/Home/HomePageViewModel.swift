@@ -104,11 +104,11 @@ final class HomePageViewModel {
             urls.append(contentsOf: posterURLs(in: list))
         }
 
-        await ImagePrefetcher.prefetch(urls)
+        await ImagePrefetching.prefetch(urls)
     }
 
     private func prefetchPosterImages(for list: ListRespond) async {
-        await ImagePrefetcher.prefetch(posterURLs(in: list))
+        await ImagePrefetching.prefetch(posterURLs(in: list))
     }
 
     private func posterURLs(in list: ListRespond?) -> [URL] {

@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import UIKit
+import Nuke
+import NukeUI
 
 struct AsyncPoster: View {
     let path: String?
@@ -24,26 +27,39 @@ struct AsyncPoster: View {
         TMDBImage.url(for: path, size: size)
     }
 
+    private var request: ImageRequest? {
+        guard let url else { return nil }
+
+        let targetSize = CGSize(
+            width: width ?? UIScreen.main.bounds.width,
+            height: height ?? UIScreen.main.bounds.height
+        )
+        let resizeMode: ImageProcessingOptions.ContentMode = contentMode == .fill ? .aspectFill : .aspectFit
+        let processors: [any ImageProcessing] = [
+            ImageProcessors.Resize(size: targetSize, unit: .points, contentMode: resizeMode)
+        ]
+
+        return ImageRequest(url: url, processors: processors)
+    }
+
     var body: some View {
         Group {
-            if let url {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView()
-                    case .success(let image):
+            if let request {
+                LazyImage(request: request) { state in
+                    if let image = state.image {
                         image
                             .resizable()
                             .aspectRatio(contentMode: contentMode)
-                    case .failure:
+                    } else if state.error != nil {
                         placeholderView
                             .task {
                                 await retryIfPossible()
                             }
-                    @unknown default:
-                        placeholderView
+                    } else {
+                        ProgressView()
                     }
                 }
+                .pipeline(.shared)
                 .id(reloadToken)
             } else {
                 placeholderView

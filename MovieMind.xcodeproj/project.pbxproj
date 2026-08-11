@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		375230742FFCA1EB00E2C37D /* FluidHeader in Frameworks */ = {isa = PBXBuildFile; productRef = 375230732FFCA1EB00E2C37D /* FluidHeader */; };
+		4E00000000000000000A001 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 4E00000000000000000A003 /* Nuke */; };
+		4E00000000000000000A002 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4E00000000000000000A004 /* NukeUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +52,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				375230742FFCA1EB00E2C37D /* FluidHeader in Frameworks */,
+				4E00000000000000000A001 /* Nuke in Frameworks */,
+				4E00000000000000000A002 /* NukeUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +92,8 @@
 			name = MovieMind;
 			packageProductDependencies = (
 				375230732FFCA1EB00E2C37D /* FluidHeader */,
+				4E00000000000000000A003 /* Nuke */,
+				4E00000000000000000A004 /* NukeUI */,
 			);
 			productName = MovieMind;
 			productReference = 3753F6802FFC9DB700DC7E17 /* MovieMind.app */;
@@ -119,6 +125,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				37667EE52FF2A9DE00090D5B /* XCRemoteSwiftPackageReference "FluidHeader" */,
+				4E00000000000000000A005 /* XCRemoteSwiftPackageReference "Nuke" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3791FC482FEC5DE50005CBA4;
@@ -398,6 +405,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		4E00000000000000000A005 /* XCRemoteSwiftPackageReference "Nuke" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.8.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -405,6 +420,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 37667EE52FF2A9DE00090D5B /* XCRemoteSwiftPackageReference "FluidHeader" */;
 			productName = FluidHeader;
+		};
+		4E00000000000000000A003 /* Nuke */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E00000000000000000A005 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = Nuke;
+		};
+		4E00000000000000000A004 /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E00000000000000000A005 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
