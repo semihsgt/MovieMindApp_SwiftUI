@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-struct AskAIRoute: Hashable {
-    let query: String
-}
-
 struct SearchView: View {
     
     @State private var viewModel = SearchViewModel()
@@ -163,24 +159,20 @@ struct SearchRowView: View {
                     .multilineTextAlignment(.leading)
 
                 HStack {
-                    if let voteAverage = item.voteAverage, voteAverage > 0 {
+                    if item.voteAverage > 0 {
                         HStack(spacing: 4) {
                             Image(systemName: "star.fill")
                                 .foregroundStyle(.yellow)
                                 .font(.caption)
 
-                            Text(String(format: "%.1f", voteAverage))
+                            Text(String(format: "%.1f", item.voteAverage))
                                 .font(.caption.bold())
                                 .foregroundStyle(.secondary)
                         }
                     }
 
-                    if let releaseDate = item.releaseDate?.prefix(4), !releaseDate.isEmpty {
-                        Text(releaseDate)
-                            .font(.caption.bold())
-                            .foregroundStyle(.secondary)
-                    } else if let firstAirDate = item.firstAirDate?.prefix(4), !firstAirDate.isEmpty {
-                        Text(firstAirDate)
+                    if let year = item.displayDate?.releaseYear {
+                        Text(year)
                             .font(.caption.bold())
                             .foregroundStyle(.secondary)
                     }

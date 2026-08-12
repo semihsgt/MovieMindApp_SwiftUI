@@ -39,7 +39,7 @@ final class UpcomingViewModel {
 
             let movieList = try await movies.stamping(.movie)
             let tvList = await tvShows?.stamping(.tv)
-            let combined = (movieList.results ?? []) + (tvList?.results ?? [])
+            let combined = movieList.results + (tvList?.results ?? [])
 
             let items = UpcomingUIModelMapper.map(combined, genres: genres)
 

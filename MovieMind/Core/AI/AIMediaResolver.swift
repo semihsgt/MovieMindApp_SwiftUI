@@ -53,10 +53,11 @@ enum AIMediaResolver {
             : .searchMovies(query: recommendation.title)
 
         guard let response = try? await network.fetchSearch(for: endpoint),
-              let results = response.results,
-              !results.isEmpty else {
+              !response.results.isEmpty else {
             return nil
         }
+
+        let results = response.results
 
         let picked: MediaItem
         if let year = recommendation.year,

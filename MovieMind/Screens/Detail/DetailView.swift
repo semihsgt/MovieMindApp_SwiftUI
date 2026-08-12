@@ -18,7 +18,7 @@ struct DetailView: View {
         StateContainerView(state: viewModel.state) {
             await viewModel.load(id: id, mediaType: mediaType)
         } loading: {
-            skeletonView
+            DetailSkeletonView()
         } content: { item in
             detailScrollContent(for: item)
         }
@@ -59,144 +59,69 @@ struct DetailView: View {
 
                 detailContent(for: item)
                     .padding(.top, 24)
-                    .background(alignment: .top) {
-                        LinearGradient(
-                            colors: [.black.opacity(0.7), .black, .black, .black, .black, .black],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        .padding(.horizontal, -30)
-                        .padding(.bottom, -30)
-                        .blur(radius: 10)
-                    }
+                    .darkFadeBackground()
             }
         }
         .ignoresSafeArea(edges: .top)
-    }
-
-    private var skeletonView: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: 0) {
-                heroSkeleton
-
-                VStack(alignment: .leading, spacing: 20) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.white.opacity(0.08))
-                            .frame(height: 14)
-                            .shimmer()
-
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.white.opacity(0.08))
-                            .frame(height: 14)
-                            .shimmer()
-
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.white.opacity(0.08))
-                            .frame(width: 180, height: 14)
-                            .shimmer()
-                    }
-                    .padding(.horizontal)
-
-                    castRowSkeleton
-                }
-                .padding(.top, 24)
-                .padding(.bottom, 40)
-                .background(Color.black)
-            }
-        }
-        .ignoresSafeArea(edges: .top)
-    }
-
-    private var heroSkeleton: some View {
-        Rectangle()
-            .fill(Color.white.opacity(0.08))
-            .shimmer()
-            .aspectRatio(2/3, contentMode: .fit)
-            .frame(maxWidth: .infinity)
-            .ignoresSafeArea(edges: .top)
-    }
-
-    private var castRowSkeleton: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                ForEach(0..<4, id: \.self) { _ in
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.white.opacity(0.08))
-                        .frame(width: 100, height: 150)
-                        .shimmer()
-                }
-            }
-            .padding(.horizontal)
-        }
     }
 
     @ViewBuilder
     private func detailContent(for hero: HeroUIModel) -> some View {
         VStack(alignment: .leading, spacing: 24) {
             if let movie = viewModel.movieDetail {
-                OverviewSection(tagline: movie.tagline, overview: movie.overview)
-                GenreChipsRow(names: hero.genreNames)
-                MetadataRow(items: movieMetadata(movie))
-                CreditLine(label: "Director", names: directorNames(movie))
-                CastSection(cast: movie.credits?.cast)
-                if let collection = movie.belongsToCollection, let collectionId = collection.id {
-                    let collectionRoute = CollectionRoute(id: collectionId, name: collection.name ?? "Collection")
-                    NavigationLink(value: collectionRoute) {
-                        CollectionBanner(collection: collection)
-                    }
-                    .buttonStyle(.plain)
-                    .zoomSource(id: collectionRoute)
-                }
+                movieSections(movie, hero: hero)
             } else if let tv = viewModel.tvDetail {
-                OverviewSection(tagline: tv.tagline, overview: tv.overview)
-                GenreChipsRow(names: hero.genreNames)
-                MetadataRow(items: tvMetadata(tv))
-                CreditLine(label: "Created by", names: (tv.createdBy ?? []).compactMap(\.name))
-                EpisodeSection(title: "Next Episode", episode: tv.nextEpisodeToAir)
-                EpisodeSection(title: "Last Episode", episode: tv.lastEpisodeToAir)
-                CastSection(cast: tv.credits?.cast)
-                SeasonsSection(seasons: tv.seasons)
+                tvSections(tv, hero: hero)
             } else if let person = viewModel.personDetail {
-                BiographySection(biography: person.biography)
-                SectionView(title: "Known For",
-                            description: "Most popular credits.",
-                            data: viewModel.knownFor)
+                personSections(person)
             }
 
             WatchProvidersSection(providers: viewModel.watchProviders)
 
             SectionView(title: "Similar",
                         description: "More like this.",
-                        data: viewModel.similar?.results)
+                        data: viewModel.similar?.results ?? [])
         }
         .padding(.bottom, 40)
     }
 
-    private func directorNames(_ movie: MovieDetail) -> [String] {
-        (movie.credits?.crew ?? [])
-            .filter { $0.job == "Director" }
-            .compactMap(\.name)
+    @ViewBuilder
+    private func movieSections(_ movie: MovieDetail, hero: HeroUIModel) -> some View {
+        OverviewSection(tagline: movie.tagline, overview: movie.overview)
+        GenreChipsRow(names: hero.genreNames)
+        MetadataRow(items: movie.metadataItems)
+        CreditLine(label: "Director", names: movie.directorNames)
+        CastSection(cast: movie.cast)
+
+        if let collection = movie.belongsToCollection, let collectionId = collection.id {
+            let route = CollectionRoute(id: collectionId, name: collection.displayName)
+            NavigationLink(value: route) {
+                CollectionBanner(collection: collection)
+            }
+            .buttonStyle(.plain)
+            .zoomSource(id: route)
+        }
     }
 
-    private func movieMetadata(_ movie: MovieDetail) -> [String] {
-        var items: [String] = []
-        if let year = movie.releaseDate?.prefix(4), !year.isEmpty { items.append(String(year)) }
-        if let runtime = movie.runtime, runtime > 0 { items.append("\(runtime / 60)h \(runtime % 60)m") }
-        if let vote = movie.voteAverage, vote > 0 { items.append(String(format: "★ %.1f", vote)) }
-        if let status = movie.status, status != "Released" { items.append(status) }
-        return items
+    @ViewBuilder
+    private func tvSections(_ tv: TVDetail, hero: HeroUIModel) -> some View {
+        OverviewSection(tagline: tv.tagline, overview: tv.overview)
+        GenreChipsRow(names: hero.genreNames)
+        MetadataRow(items: tv.metadataItems)
+        CreditLine(label: "Created by", names: tv.creatorNames)
+        EpisodeSection(title: "Next Episode", episode: tv.nextEpisodeToAir)
+        EpisodeSection(title: "Last Episode", episode: tv.lastEpisodeToAir)
+        CastSection(cast: tv.cast)
+        SeasonsSection(seasons: tv.seasons)
     }
 
-    private func tvMetadata(_ tv: TVDetail) -> [String] {
-        var items: [String] = []
-        if let year = tv.firstAirDate?.prefix(4), !year.isEmpty { items.append(String(year)) }
-        if let seasons = tv.numberOfSeasons { items.append("\(seasons) Season\(seasons == 1 ? "" : "s")") }
-        if let vote = tv.voteAverage, vote > 0 { items.append(String(format: "★ %.1f", vote)) }
-        if let status = tv.status, status == "Ended" || status == "Canceled" { items.append(status) }
-        return items
+    @ViewBuilder
+    private func personSections(_ person: PersonDetail) -> some View {
+        BiographySection(biography: person.biography)
+        SectionView(title: "Known For",
+                    description: "Most popular credits.",
+                    data: viewModel.knownFor)
     }
-
 }
 
 #Preview("Movie") {

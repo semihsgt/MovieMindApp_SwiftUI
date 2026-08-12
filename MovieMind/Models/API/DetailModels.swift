@@ -7,85 +7,95 @@
 
 import Foundation
 
-struct MovieDetail: Decodable, Identifiable {
+// Property order is the same in every model: id, the fields TMDB always sends
+// (non-optional via `@Fallback`), then the ones whose absence the UI reacts to.
+
+struct MovieDetail: Decodable, Identifiable, Sendable {
     let id: Int?
-    let title: String?
-    let adult: Bool?
-    let status: String?
-    let tagline: String?
-    let overview: String?
-    let releaseDate: String?
-    let runtime: Int?
-    let popularity: Double?
-    let voteAverage: Double?
+    @Fallback var title: String = ""
+    @Fallback var tagline: String = ""
+    @Fallback var overview: String = ""
+    @Fallback var status: String = ""
+    @Fallback var runtime: Int = 0
+    @Fallback var popularity: Double = 0
+    @Fallback var voteAverage: Double = 0
+    @Fallback var adult: Bool = false
+    @Fallback var genres: [Genre] = []
     let posterPath: String?
+    let releaseDate: String?
     let belongsToCollection: BelongsToCollection?
-    let genres: [Genre]?
     let credits: Credits?
 }
 
-struct TVDetail: Decodable, Identifiable {
+struct TVDetail: Decodable, Identifiable, Sendable {
     let id: Int?
-    let name: String?
-    let adult: Bool?
-    let status: String?
-    let tagline: String?
-    let overview: String?
-    let firstAirDate: String?
-    let numberOfSeasons: Int?
-    let popularity: Double?
-    let voteAverage: Double?
+    @Fallback var name: String = ""
+    @Fallback var tagline: String = ""
+    @Fallback var overview: String = ""
+    @Fallback var status: String = ""
+    @Fallback var numberOfSeasons: Int = 0
+    @Fallback var popularity: Double = 0
+    @Fallback var voteAverage: Double = 0
+    @Fallback var adult: Bool = false
+    @Fallback var genres: [Genre] = []
+    @Fallback var seasons: [Season] = []
+    @Fallback var createdBy: [CreatedBy] = []
     let posterPath: String?
+    let firstAirDate: String?
     let lastEpisodeToAir: TEpisodeToAir?
     let nextEpisodeToAir: TEpisodeToAir?
-    let seasons: [Season]?
-    let createdBy: [CreatedBy]?
-    let genres: [Genre]?
     let credits: Credits?
 }
 
-struct PersonDetail: Decodable, Identifiable {
+struct PersonDetail: Decodable, Identifiable, Sendable {
     let id: Int?
-    let name: String?
-    let adult: Bool?
-    let biography: String?
-    let knownForDepartment: String?
-    let popularity: Double?
+    @Fallback var name: String = ""
+    @Fallback var biography: String = ""
+    @Fallback var popularity: Double = 0
+    @Fallback var adult: Bool = false
     let profilePath: String?
+    let knownForDepartment: String?
 }
 
-struct BelongsToCollection: Decodable, Identifiable {
+struct BelongsToCollection: Decodable, Identifiable, Sendable {
     let id: Int?
-    let name: String?
+    @Fallback var name: String = ""
+    let backdropPath: String?
+
+    var displayName: String { name.isEmpty ? "Collection" : name }
+}
+
+struct CollectionDetail: Decodable, Sendable {
+    let id: Int?
+    @Fallback var name: String = ""
+    @Fallback var overview: String = ""
+    @Fallback var parts: [MediaItem] = []
     let backdropPath: String?
 }
 
-struct CollectionDetail: Decodable {
+struct CreatedBy: Decodable, Identifiable, Sendable {
     let id: Int?
-    let name: String?
-    let overview: String?
-    let backdropPath: String?
-    let parts: [MediaItem]?
+    @Fallback var name: String = ""
 }
 
-struct CreatedBy: Decodable, Identifiable {
+struct TEpisodeToAir: Decodable, Identifiable, Sendable {
     let id: Int?
-    let name: String?
-}
-
-struct TEpisodeToAir: Decodable, Identifiable {
-    let id: Int?
-    let seasonNumber: Int?
-    let episodeNumber: Int?
-    let name: String?
+    @Fallback var name: String = ""
+    @Fallback var seasonNumber: Int = 0
+    @Fallback var episodeNumber: Int = 0
     let airDate: String?
     let stillPath: String?
+
+    var displayName: String { name.isEmpty ? "Untitled" : name }
+    var hasNumbering: Bool { seasonNumber > 0 && episodeNumber > 0 }
 }
 
-struct Season: Decodable, Identifiable {
+struct Season: Decodable, Identifiable, Sendable {
     let id: Int?
-    let seasonNumber: Int?
-    let name: String?
-    let episodeCount: Int?
+    @Fallback var name: String = ""
+    @Fallback var seasonNumber: Int = 0
+    @Fallback var episodeCount: Int = 0
     let posterPath: String?
+
+    var displayName: String { name.isEmpty ? "Season \(seasonNumber)" : name }
 }

@@ -30,26 +30,25 @@ struct LibraryListView: View {
     }
 
     var body: some View {
-        Group {
+        List {
+            ForEach(items) { item in
+                let route = MediaRoute(id: item.mediaId, mediaType: item.mediaType)
+                NavigationLink(value: route) {
+                    row(for: item)
+                }
+                .zoomSource(id: route)
+            }
+            .onDelete(perform: delete)
+            .listSectionSeparator(.hidden)
+        }
+        .listStyle(.plain)
+        .overlay {
             if items.isEmpty {
                 ContentUnavailableView(
                     "Nothing Here Yet",
                     systemImage: "bookmark",
                     description: Text("Saved items of this type will appear here.")
                 )
-            } else {
-                List {
-                    ForEach(items) { item in
-                        let route = MediaRoute(id: item.mediaId, mediaType: item.mediaType)
-                        NavigationLink(value: route) {
-                            row(for: item)
-                        }
-                        .zoomSource(id: route)
-                    }
-                    .onDelete(perform: delete)
-                    .listSectionSeparator(.hidden)
-                }
-                .listStyle(.plain)
             }
         }
         .navigationTitle(title)

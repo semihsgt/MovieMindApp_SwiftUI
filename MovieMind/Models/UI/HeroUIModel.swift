@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct HeroUIModel: Identifiable {
+struct HeroUIModel: Identifiable, Sendable {
     let id: Int
     let result: MediaItem
     var images: Images?

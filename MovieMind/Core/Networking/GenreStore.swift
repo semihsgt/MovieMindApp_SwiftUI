@@ -46,7 +46,7 @@ actor GenreStore: GenreProviding {
 
         let genres = (movieResponse?.genres ?? []) + (tvResponse?.genres ?? [])
         return genres.reduce(into: [Int: String]()) { dictionary, genre in
-            if let id = genre.id, let name = genre.name { dictionary[id] = name }
+            if let id = genre.id, !genre.name.isEmpty { dictionary[id] = genre.name }
         }
     }
 }

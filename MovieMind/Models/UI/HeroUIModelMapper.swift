@@ -20,14 +20,14 @@ enum HeroUIModelMapper {
                              popularity: movie.popularity,
                              voteAverage: movie.voteAverage,
                              posterPath: movie.posterPath,
-                             genreIds: movie.genres?.compactMap(\.id),
+                             genreIds: movie.genres.compactMap(\.id),
                              title: movie.title,
                              releaseDate: movie.releaseDate)
 
         return HeroUIModel(id: id,
                            result: item,
                            images: images,
-                           genreNames: movie.genres?.compactMap(\.name) ?? [])
+                           genreNames: movie.genres.genreNames)
     }
 
     static func map(_ tv: TVDetail, images: Images?) -> HeroUIModel? {
@@ -39,14 +39,14 @@ enum HeroUIModelMapper {
                              popularity: tv.popularity,
                              voteAverage: tv.voteAverage,
                              posterPath: tv.posterPath,
-                             genreIds: tv.genres?.compactMap(\.id),
+                             genreIds: tv.genres.compactMap(\.id),
                              name: tv.name,
                              firstAirDate: tv.firstAirDate)
 
         return HeroUIModel(id: id,
                            result: item,
                            images: images,
-                           genreNames: tv.genres?.compactMap(\.name) ?? [])
+                           genreNames: tv.genres.genreNames)
     }
 
     static func map(_ person: PersonDetail, images: Images?) -> HeroUIModel? {
@@ -64,5 +64,13 @@ enum HeroUIModelMapper {
                            result: item,
                            images: images,
                            genreNames: [person.knownForDepartment].compactMap { $0 })
+    }
+}
+
+extension Array where Element == Genre {
+
+    /// Drops the genres the API returned without a usable name.
+    var genreNames: [String] {
+        map(\.name).filter { !$0.isEmpty }
     }
 }

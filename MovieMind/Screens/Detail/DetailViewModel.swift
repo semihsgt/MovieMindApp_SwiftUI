@@ -13,7 +13,7 @@ import SwiftUI
 final class DetailViewModel {
 
     private(set) var state: ViewState<HeroUIModel> = .idle
-    private(set) var knownFor: [MediaItem]?
+    private(set) var knownFor: [MediaItem] = []
     private(set) var movieDetail: MovieDetail?
     private(set) var tvDetail: TVDetail?
     private(set) var personDetail: PersonDetail?
@@ -48,7 +48,7 @@ final class DetailViewModel {
         personDetail = nil
         similar = nil
         watchProviders = nil
-        knownFor = nil
+        knownFor = []
 
         switch mediaType {
         case .movie:  await loadMovie(id: id)
@@ -76,7 +76,7 @@ final class DetailViewModel {
             }
 
             await prefetchDetailImages(hero: hero,
-                                       castProfiles: movie.credits?.cast,
+                                       castProfiles: movie.cast,
                                        collectionBackdrop: movie.belongsToCollection?.backdropPath)
             show(hero)
         } catch {
@@ -103,10 +103,9 @@ final class DetailViewModel {
             }
 
             await prefetchDetailImages(hero: hero,
-                                       castProfiles: tv.credits?.cast,
+                                       castProfiles: tv.cast,
                                        seasons: tv.seasons,
-                                       episodeStills: [tv.nextEpisodeToAir?.stillPath,
-                                                       tv.lastEpisodeToAir?.stillPath])
+                                       episodeStills: tv.episodeStills)
             show(hero)
         } catch {
             state = .failed(error)
@@ -146,15 +145,16 @@ final class DetailViewModel {
         state = .failed(NetworkError.incompleteData)
     }
 
-    private static func topCredits(from credits: CombinedCredits?) -> [MediaItem]? {
-        guard let cast = credits?.cast, !cast.isEmpty else { return nil }
+    /// The 20 most popular credits, one row per person.
+    private static func topCredits(from credits: CombinedCredits?) -> [MediaItem] {
+        guard let credits else { return [] }
 
         var seen = Set<Int>()
-        let unique = cast.filter { item in
+        let unique = credits.cast.filter { item in
             guard let id = item.id else { return false }
             return seen.insert(id).inserted
         }
-        return Array(unique.sorted { ($0.popularity ?? 0) > ($1.popularity ?? 0) }.prefix(20))
+        return Array(unique.sorted { $0.popularity > $1.popularity }.prefix(20))
     }
 
     private static func pickRegion(from response: WatchProviderResponse?) -> CountryWatchProviders? {
@@ -165,21 +165,21 @@ final class DetailViewModel {
 
     private func prefetchDetailImages(
         hero: HeroUIModel,
-        castProfiles: [CastMember]? = nil,
-        knownFor: [MediaItem]? = nil,
+        castProfiles: [CastMember] = [],
+        knownFor: [MediaItem] = [],
         collectionBackdrop: String? = nil,
-        seasons: [Season]? = nil,
+        seasons: [Season] = [],
         episodeStills: [String?] = []
     ) async {
         await prefetcher.prefetch([hero.images?.bestPoster ?? hero.result.displayPath], size: .w780)
         await prefetcher.prefetch([hero.images?.bestLogo()], size: .w500)
 
-        var thumbnails: [String?] = (castProfiles ?? []).map(\.profilePath)
-        thumbnails += (seasons ?? []).map(\.posterPath)
+        var thumbnails: [String?] = castProfiles.map(\.profilePath)
+        thumbnails += seasons.map(\.posterPath)
         thumbnails += episodeStills
         thumbnails += (watchProviders?.all ?? []).map(\.logoPath)
 
-        var posters: [String?] = (knownFor ?? []).map(\.displayPath)
+        var posters: [String?] = knownFor.map(\.displayPath)
         posters += (similar?.results ?? []).map(\.displayPath)
         posters.append(collectionBackdrop)
 

@@ -130,7 +130,7 @@ final class HomeViewModel {
 
         return results.compactMap { item in
             guard let id = item.id, item.mediaType != nil else { return nil }
-            let names = (item.genreIds ?? []).compactMap { genreDictionary[$0] }
+            let names = item.genreIds.compactMap { genreDictionary[$0] }
             return HeroUIModel(id: id, result: item, images: nil, genreNames: names)
         }
     }

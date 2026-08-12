@@ -137,8 +137,8 @@ struct HeroCard: View {
                     Text(department)
                 }
 
-                if let topKnown = item.result.knownFor?.first {
-                    let topTitle = topKnown.title ?? topKnown.name ?? ""
+                if let topKnown = item.result.knownFor.first {
+                    let topTitle = topKnown.displayName
                     if !topTitle.isEmpty {
                         Text("•")
                         Text("Known for \(topTitle)")
@@ -156,7 +156,7 @@ struct HeroCard: View {
                     Text(genreName)
                 }
 
-                if item.result.adult == true {
+                if item.result.adult {
                     Text("•")
                     Text("18+")
                         .foregroundStyle(.red)

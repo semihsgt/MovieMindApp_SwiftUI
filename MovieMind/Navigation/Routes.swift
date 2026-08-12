@@ -49,3 +49,7 @@ struct CollectionRoute: Hashable {
     let id: Int
     let name: String
 }
+
+struct AskAIRoute: Hashable {
+    let query: String
+}

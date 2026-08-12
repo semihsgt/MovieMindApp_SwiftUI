@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UpcomingUIModel: Identifiable {
+struct UpcomingUIModel: Identifiable, Sendable {
     let id: Int
     let mediaType: MediaType
     let result: MediaItem
@@ -24,7 +24,7 @@ enum UpcomingUIModelMapper {
                 return UpcomingUIModel(id: id,
                                        mediaType: item.mediaType ?? .movie,
                                        result: item,
-                                       genreNames: (item.genreIds ?? []).compactMap { genres[$0] })
+                                       genreNames: item.genreIds.compactMap { genres[$0] })
             }
             .sorted { first, second in
                 guard let a = first.result.displayDate, !a.isEmpty else { return false }

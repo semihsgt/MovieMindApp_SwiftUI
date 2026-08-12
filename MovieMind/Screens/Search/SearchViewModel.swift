@@ -58,7 +58,7 @@ final class SearchViewModel {
             let response = try await networkService.fetchSearch(for: .searchMulti(query: query, page: 1))
             guard !Task.isCancelled else { return }
             totalPages = response.totalPages ?? 1
-            state = .loaded((response.results ?? []).filter { $0.id != nil })
+            state = .loaded(response.results.filter { $0.id != nil })
         } catch is CancellationError {
             return
         } catch {
@@ -86,7 +86,7 @@ final class SearchViewModel {
             totalPages = response.totalPages ?? totalPages
 
             let existingIds = Set(items.compactMap(\.id))
-            let newItems = (response.results ?? []).filter {
+            let newItems = response.results.filter {
                 guard let id = $0.id else { return false }
                 return !existingIds.contains(id)
             }

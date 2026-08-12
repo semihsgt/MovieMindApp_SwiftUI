@@ -1,5 +1,5 @@
 //
-//  AsyncPosterView.swift
+//  AsyncPoster.swift
 //  MovieMind
 //
 //  Created by Semih Söğüt on 29.06.2026.
@@ -84,5 +84,12 @@ struct AsyncPoster: View {
 }
 
 #Preview {
-    HomeView()
+    VStack(spacing: 16) {
+        AsyncPoster(path: HeroUIModel.previewMovie.result.posterPath,
+                    width: 120, height: 180)
+
+        // No path: falls through to the placeholder.
+        AsyncPoster(path: nil, width: 120, height: 180)
+    }
+    .padding()
 }

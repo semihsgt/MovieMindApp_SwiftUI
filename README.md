@@ -68,11 +68,11 @@ MovieMind/
 │   ├── Persistence/ SwiftData model
 │   └── Extensions/  Date/String helpers
 ├── Models/
-│   ├── API/         Codable TMDB responses
+│   ├── API/         Codable TMDB responses + the @Fallback wrapper
 │   └── UI/          Presentation models + mappers
 ├── Navigation/      Route types, zoom transition
-├── Components/      Reusable views (HeroCard, AsyncPoster, SectionView, ViewState, …)
-├── Features/        One folder per screen: view + view model + its own subviews
+├── Components/      Reusable views (HeroCard, AsyncPoster, SectionView, SkeletonBox, …)
+├── Screens/         One folder per screen: view + view model + skeleton + its own subviews
 └── PreviewContent/  Fixtures for SwiftUI previews
 ```
 

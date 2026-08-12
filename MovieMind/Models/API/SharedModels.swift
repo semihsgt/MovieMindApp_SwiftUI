@@ -7,52 +7,54 @@
 
 import Foundation
 
-struct Genre: Decodable, Identifiable {
+struct Genre: Decodable, Identifiable, Sendable {
     let id: Int?
-    let name: String?
+    @Fallback var name: String = ""
 }
 
-struct Images: Decodable, Identifiable {
+struct Images: Decodable, Identifiable, Sendable {
     let id: Int?
-    let logos: [ImageDetails]?
-    let posters: [ImageDetails]?
+    @Fallback var logos: [ImageDetails] = []
+    @Fallback var posters: [ImageDetails] = []
 
+    /// The language-neutral poster: no text baked into the artwork.
     var bestPoster: String? {
-        posters?.first { $0.iso6391 == nil }?.filePath
+        posters.first { $0.iso6391 == nil }?.filePath
     }
 
     func bestLogo(language: String = "en") -> String? {
-        logos?.first { $0.iso6391 == language }?.filePath ?? logos?.first?.filePath
+        logos.first { $0.iso6391 == language }?.filePath ?? logos.first?.filePath
     }
 }
 
-struct ImageDetails: Decodable {
+struct ImageDetails: Decodable, Sendable {
+    /// Stays optional: `nil` marks the language-neutral asset, which `bestPoster` relies on.
     let iso6391: String?
     let filePath: String?
 }
 
-struct WatchProviderResponse: Decodable {
+/// Providers keyed by region code — "TR", "US", …
+struct WatchProviderResponse: Decodable, Sendable {
     let id: Int?
-    let results: [String: CountryWatchProviders]?
+    @Fallback var results: [String: CountryWatchProviders] = [:]
 }
 
-struct CountryWatchProviders: Decodable {
-    let flatrate: [WatchProvider]?
-    let rent: [WatchProvider]?
-    let buy: [WatchProvider]?
-    let free: [WatchProvider]?
-    let ads: [WatchProvider]?
+struct CountryWatchProviders: Decodable, Sendable {
+    @Fallback var flatrate: [WatchProvider] = []
+    @Fallback var rent: [WatchProvider] = []
+    @Fallback var buy: [WatchProvider] = []
+    @Fallback var free: [WatchProvider] = []
+    @Fallback var ads: [WatchProvider] = []
 
-    var all: [WatchProvider] {
-        (flatrate ?? []) + (free ?? []) + (ads ?? []) + (rent ?? []) + (buy ?? [])
-    }
+    var all: [WatchProvider] { flatrate + free + ads + rent + buy }
 }
 
-struct WatchProvider: Decodable, Identifiable {
+struct WatchProvider: Decodable, Identifiable, Sendable {
     let providerId: Int?
-    let providerName: String?
+    @Fallback var providerName: String = ""
     let logoPath: String?
+    /// Stays optional: "no priority given" sorts last, which 0 would not.
     let displayPriority: Int?
 
-    var id: String { "\(providerId ?? 0)-\(providerName ?? "")" }
+    var id: String { "\(providerId ?? 0)-\(providerName)" }
 }

@@ -20,8 +20,8 @@ struct CollectionView: View {
         } content: { detail in
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
-                    if let overview = detail.overview, !overview.isEmpty {
-                        Text(overview)
+                    if !detail.overview.isEmpty {
+                        Text(detail.overview)
                             .font(.body)
                             .foregroundStyle(.secondary)
                     }
@@ -51,7 +51,7 @@ struct CollectionView: View {
     }
 
     private func sortedParts(_ detail: CollectionDetail) -> [MediaItem] {
-        (detail.parts ?? []).map { item -> MediaItem in
+        detail.parts.map { item -> MediaItem in
             var copy = item
             copy.mediaType = .movie
             return copy

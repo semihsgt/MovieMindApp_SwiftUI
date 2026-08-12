@@ -61,7 +61,62 @@ extension HeroUIModel {
             profilePath: "/kHO7hdNEVuTnQ0OjjrxP1RcAa0e.jpg",
             knownFor: [KnownFor(name: "Stranger Things", title: nil)]
         ),
-        images: Images(id: 1356210, logos: nil, posters: nil),
+        images: Images(id: 1356210, logos: [], posters: []),
         genreNames: ["Acting"]
+    )
+}
+
+// MARK: - Detail section samples
+
+extension Season {
+    static let preview = Season(id: 1,
+                                name: "Season 1",
+                                seasonNumber: 1,
+                                episodeCount: 9,
+                                posterPath: "/aUCiBTNbBoM4dP4YBmVMSnzRLDG.jpg")
+
+    /// TMDB sometimes omits the name; `displayName` falls back to the number.
+    static let previewUnnamed = Season(id: 2,
+                                       name: "",
+                                       seasonNumber: 2,
+                                       episodeCount: 7,
+                                       posterPath: nil)
+}
+
+extension TEpisodeToAir {
+    static let preview = TEpisodeToAir(id: 10,
+                                       name: "Future Days",
+                                       seasonNumber: 2,
+                                       episodeNumber: 1,
+                                       airDate: "2025-04-13",
+                                       stillPath: "/xnE0PPFTfcxHkQFVjfLNRRTxLST.jpg")
+}
+
+extension CastMember {
+    static let previews = [
+        CastMember(id: 1, name: "Pedro Pascal", character: "Joel Miller",
+                   profilePath: "/9VYK7ovcH1eyfNjqNTn3Vd2yGRw.jpg", creditId: "c1"),
+        CastMember(id: 2, name: "Bella Ramsey", character: "Ellie Williams",
+                   profilePath: "/1kks3YnVkpyQxzw36iyHnPjEChs.jpg", creditId: "c2"),
+        CastMember(id: 3, name: "Gabriel Luna", character: "Tommy Miller",
+                   profilePath: nil, creditId: "c3")
+    ]
+}
+
+extension BelongsToCollection {
+    static let preview = BelongsToCollection(id: 726871,
+                                             name: "Dune Collection",
+                                             backdropPath: "/l4QHerTSbMI7qgvasqxP36pqjN6.jpg")
+}
+
+extension CountryWatchProviders {
+    static let preview = CountryWatchProviders(
+        flatrate: [WatchProvider(providerId: 8, providerName: "Netflix",
+                                 logoPath: "/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg", displayPriority: 0)],
+        rent: [WatchProvider(providerId: 2, providerName: "Apple TV",
+                             logoPath: "/9ghgSC0MA082EL6HLCW3GalykFD.jpg", displayPriority: 1)],
+        buy: [],
+        free: [],
+        ads: []
     )
 }

@@ -7,65 +7,71 @@
 
 import Foundation
 
-enum MediaType: String, Codable {
+enum MediaType: String, Codable, Sendable {
     case movie
     case tv
     case person
 }
 
-struct GenreResponse: Decodable {
-    let genres: [Genre]?
+struct GenreResponse: Decodable, Sendable {
+    @Fallback var genres: [Genre] = []
 }
 
-struct ListRespond: Decodable {
+struct ListRespond: Decodable, Sendable {
+    @Fallback var results: [MediaItem] = []
     let page: Int?
-    let results: [MediaItem]?
     let totalPages: Int?
 }
 
 extension ListRespond {
 
+    /// Search and detail endpoints omit `media_type`; the caller knows it, so it stamps it in.
     func stamping(_ mediaType: MediaType) -> ListRespond {
-        guard let results else { return self }
         let stamped = results.map { item in
             var copy = item
             copy.mediaType = mediaType
             return copy
         }
-        return ListRespond(page: page, results: stamped, totalPages: totalPages)
+        return ListRespond(results: stamped, page: page, totalPages: totalPages)
     }
 }
 
-struct MediaItem: Decodable, Identifiable {
+/// A row in any list: movie, show or person.
+///
+/// `title`/`releaseDate` belong to movies and `name`/`firstAirDate` to TV and
+/// people, so neither pair is "missing data" — read them through `displayName`
+/// and `displayDate` instead. A nil `id` means the row is unusable and every
+/// consumer drops it.
+struct MediaItem: Decodable, Identifiable, Sendable {
     let id: Int?
-    var mediaType: MediaType?
-    let adult: Bool?
-    let popularity: Double?
-    let voteAverage: Double?
-    let posterPath: String?
-    let genreIds: [Int]?
-    let name: String?
+    @Fallback var popularity: Double = 0
+    @Fallback var voteAverage: Double = 0
+    @Fallback var adult: Bool = false
+    @Fallback var genreIds: [Int] = []
+    @Fallback var knownFor: [KnownFor] = []
     let title: String?
+    let name: String?
     let releaseDate: String?
     let firstAirDate: String?
-    let knownForDepartment: String?
+    let posterPath: String?
     let profilePath: String?
-    let knownFor: [KnownFor]?
+    let knownForDepartment: String?
+    var mediaType: MediaType?
 
     init(id: Int?,
          mediaType: MediaType? = nil,
-         adult: Bool? = nil,
-         popularity: Double? = nil,
-         voteAverage: Double? = nil,
+         adult: Bool = false,
+         popularity: Double = 0,
+         voteAverage: Double = 0,
          posterPath: String? = nil,
-         genreIds: [Int]? = nil,
+         genreIds: [Int] = [],
          name: String? = nil,
          title: String? = nil,
          releaseDate: String? = nil,
          firstAirDate: String? = nil,
          knownForDepartment: String? = nil,
          profilePath: String? = nil,
-         knownFor: [KnownFor]? = nil) {
+         knownFor: [KnownFor] = []) {
         self.id = id
         self.mediaType = mediaType
         self.adult = adult
@@ -83,11 +89,13 @@ struct MediaItem: Decodable, Identifiable {
     }
 
     var displayName: String { title ?? name ?? "Untitled" }
-    var displayPath: String { posterPath ?? profilePath ?? " -- " }
+    var displayPath: String { posterPath ?? profilePath ?? "" }
     var displayDate: String? { releaseDate ?? firstAirDate }
 }
 
-struct KnownFor: Decodable {
+struct KnownFor: Decodable, Sendable {
     let name: String?
     let title: String?
+
+    var displayName: String { title ?? name ?? "" }
 }

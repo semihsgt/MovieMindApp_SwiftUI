@@ -14,6 +14,12 @@ extension String {
         Self.tmdbFormatter.date(from: self)
     }
 
+    /// The leading year of a TMDB date string, or nil when there isn't one.
+    var releaseYear: String? {
+        let year = prefix(4)
+        return year.isEmpty ? nil : String(year)
+    }
+
     private static let tmdbFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"

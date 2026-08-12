@@ -18,7 +18,7 @@ struct UpcomingView: View {
                 StateContainerView(state: viewModel.state) {
                     await viewModel.load()
                 } loading: {
-                    skeletonView
+                    UpcomingSkeletonView()
                 } content: { items in
                     upcomingContent(items)
                 }
@@ -57,52 +57,6 @@ struct UpcomingView: View {
         }
     }
 
-    private var skeletonView: some View {
-        VStack(spacing: 16) {
-            ForEach(0..<6, id: \.self) { _ in
-                upcomingCardSkeleton
-            }
-        }
-    }
-
-    private var upcomingCardSkeleton: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 28)
-                .fill(Color.white.opacity(0.08))
-                .shimmer()
-
-            HStack(spacing: 12) {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.white.opacity(0.12))
-                    .frame(width: 100, height: 150)
-                    .shimmer()
-                    .padding(.leading)
-
-                VStack(alignment: .leading, spacing: 10) {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.white.opacity(0.12))
-                        .frame(width: 160, height: 16)
-                        .shimmer()
-
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.white.opacity(0.12))
-                        .frame(width: 100, height: 12)
-                        .shimmer()
-
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.white.opacity(0.12))
-                        .frame(width: 130, height: 12)
-                        .shimmer()
-                }
-                .padding(.vertical, 20)
-
-                Spacer()
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 180)
-        .padding(.horizontal, 15)
-    }
 }
 
 private struct UpcomingCard: View {
@@ -146,20 +100,10 @@ private struct UpcomingCard: View {
                         }
                     }
 
-                    if item.mediaType == .movie {
-                        let formattedDate = item.result.releaseDate?.toDate()?.relativeReleaseString() ?? "Release date unknown"
-
-                        Text(formattedDate)
-                            .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.8))
-
-                    } else {
-                        let formattedDate = item.result.firstAirDate?.toDate()?.relativeReleaseString() ?? "Release date unknown"
-
-                        Text(formattedDate)
-                            .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.8))
-                    }
+                    Text(item.result.displayDate?.toDate()?.relativeReleaseString()
+                         ?? "Release date unknown")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.8))
 
                 }
                 .fontDesign(.rounded)
