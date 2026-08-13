@@ -15,6 +15,11 @@ protocol Endpoint {
     var queryItems: [URLQueryItem] { get }
 }
 
+extension Endpoint {
+    /// Most calls need nothing beyond the API key, which NetworkManager adds.
+    var queryItems: [URLQueryItem] { [] }
+}
+
 enum ListEndpoint: Endpoint {
     case upcomingMovies
     case nowPlayingMovies
@@ -31,18 +36,18 @@ enum ListEndpoint: Endpoint {
 
     var path: String {
         switch self {
-        case .upcomingMovies: return "movie/upcoming"
-        case .nowPlayingMovies: return "movie/now_playing"
-        case .trendingMovies: return "trending/movie/day"
-        case .trendingTV: return "trending/tv/day"
-        case .trendingAll: return "trending/all/day"
-        case .topRatedMovies: return "movie/top_rated"
-        case .topRatedTV: return "tv/top_rated"
-        case .popularMovies: return "movie/popular"
-        case .popularTV: return "tv/popular"
-        case .popularPeople: return "person/popular"
-        case .airingTodayTV: return "tv/airing_today"
-        case .upcomingTV: return "discover/tv"
+        case .upcomingMovies: "movie/upcoming"
+        case .nowPlayingMovies: "movie/now_playing"
+        case .trendingMovies: "trending/movie/day"
+        case .trendingTV: "trending/tv/day"
+        case .trendingAll: "trending/all/day"
+        case .topRatedMovies: "movie/top_rated"
+        case .topRatedTV: "tv/top_rated"
+        case .popularMovies: "movie/popular"
+        case .popularTV: "tv/popular"
+        case .popularPeople: "person/popular"
+        case .airingTodayTV: "tv/airing_today"
+        case .upcomingTV: "discover/tv"
         }
     }
 
@@ -77,12 +82,10 @@ enum GenreEndpoint: Endpoint {
 
     var path: String {
         switch self {
-        case .movieGenres: return "genre/movie/list"
-        case .tvGenres:    return "genre/tv/list"
+        case .movieGenres: "genre/movie/list"
+        case .tvGenres: "genre/tv/list"
         }
     }
-
-    var queryItems: [URLQueryItem] { [] }
 }
 
 enum SearchEndpoint: Endpoint {
@@ -93,10 +96,10 @@ enum SearchEndpoint: Endpoint {
 
     var path: String {
         switch self {
-        case .searchMovies: return "search/movie"
-        case .searchTV: return "search/tv"
-        case .searchPeople: return "search/person"
-        case .searchMulti: return "search/multi"
+        case .searchMovies: "search/movie"
+        case .searchTV: "search/tv"
+        case .searchPeople: "search/person"
+        case .searchMulti: "search/multi"
         }
     }
 
@@ -115,68 +118,30 @@ enum SearchEndpoint: Endpoint {
     }
 }
 
-enum DetailEndpoint: Endpoint {
-    case movieDetails(id: Int)
-    case tvDetails(id: Int)
-    case peopleDetails(id: Int)
+/// The four calls that only differ by media type and suffix.
+/// `MediaType.rawValue` is already TMDB's path segment: movie, tv, person.
+enum MediaEndpoint: Endpoint {
+    case details(MediaType, id: Int)
+    case images(MediaType, id: Int)
+    case similar(MediaType, id: Int)
+    case watchProviders(MediaType, id: Int)
 
     var path: String {
         switch self {
-        case .movieDetails(let id): return "movie/\(id)"
-        case .tvDetails(let id): return "tv/\(id)"
-        case .peopleDetails(let id): return "person/\(id)"
+        case .details(let type, let id):        "\(type.rawValue)/\(id)"
+        case .images(let type, let id):         "\(type.rawValue)/\(id)/images"
+        case .similar(let type, let id):        "\(type.rawValue)/\(id)/similar"
+        case .watchProviders(let type, let id): "\(type.rawValue)/\(id)/watch/providers"
         }
     }
 
     var queryItems: [URLQueryItem] {
-        [URLQueryItem(name: "append_to_response", value: "credits")]
-    }
-}
-
-enum ImageEndpoint: Endpoint {
-    case movieImages(id: Int)
-    case tvImages(id: Int)
-    case personImages(id: Int)
-
-    var path: String {
         switch self {
-        case .movieImages(let id): return "movie/\(id)/images"
-        case .tvImages(let id): return "tv/\(id)/images"
-        case .personImages(let id): return "person/\(id)/images"
+        case .details: [URLQueryItem(name: "append_to_response", value: "credits")]
+        case .images:  [URLQueryItem(name: "include_image_language", value: "en,null")]
+        default:       []
         }
     }
-
-    var queryItems: [URLQueryItem] {
-        [URLQueryItem(name: "include_image_language", value: "en,null")]
-    }
-}
-
-enum SimilarEndpoint: Endpoint {
-    case movieSimilar(id: Int)
-    case tvSimilar(id: Int)
-
-    var path: String {
-        switch self {
-        case .movieSimilar(let id): return "movie/\(id)/similar"
-        case .tvSimilar(let id): return "tv/\(id)/similar"
-        }
-    }
-
-    var queryItems: [URLQueryItem] { [] }
-}
-
-enum WatchProviderEndpoint: Endpoint {
-    case movieProviders(id: Int)
-    case tvProviders(id: Int)
-
-    var path: String {
-        switch self {
-        case .movieProviders(let id): return "movie/\(id)/watch/providers"
-        case .tvProviders(let id): return "tv/\(id)/watch/providers"
-        }
-    }
-
-    var queryItems: [URLQueryItem] { [] }
 }
 
 enum CreditsEndpoint: Endpoint {
@@ -184,11 +149,9 @@ enum CreditsEndpoint: Endpoint {
 
     var path: String {
         switch self {
-        case .personCombinedCredits(let id): return "person/\(id)/combined_credits"
+        case .personCombinedCredits(let id): "person/\(id)/combined_credits"
         }
     }
-
-    var queryItems: [URLQueryItem] { [] }
 }
 
 enum CollectionEndpoint: Endpoint {
@@ -196,9 +159,7 @@ enum CollectionEndpoint: Endpoint {
 
     var path: String {
         switch self {
-        case .details(let id): return "collection/\(id)"
+        case .details(let id): "collection/\(id)"
         }
     }
-
-    var queryItems: [URLQueryItem] { [] }
 }

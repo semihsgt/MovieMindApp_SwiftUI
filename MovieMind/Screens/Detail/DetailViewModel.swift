@@ -13,10 +13,8 @@ import SwiftUI
 final class DetailViewModel {
 
     private(set) var state: ViewState<HeroUIModel> = .idle
+    private(set) var content: DetailContent?
     private(set) var knownFor: [MediaItem] = []
-    private(set) var movieDetail: MovieDetail?
-    private(set) var tvDetail: TVDetail?
-    private(set) var personDetail: PersonDetail?
     private(set) var similar: ListRespond?
     private(set) var watchProviders: CountryWatchProviders?
 
@@ -47,9 +45,7 @@ final class DetailViewModel {
         state = .loading
         prefetcher.cancelAll()
 
-        movieDetail = nil
-        tvDetail = nil
-        personDetail = nil
+        content = nil
         similar = nil
         watchProviders = nil
         knownFor = []
@@ -71,7 +67,7 @@ final class DetailViewModel {
             let movie = try await detail
             let (fetchedImages, similarResult, providerResult) = await (images, similarList, providers)
 
-            movieDetail = movie
+            content = .movie(movie)
             similar = similarResult?.stamping(.movie)
             watchProviders = Self.pickRegion(from: providerResult)
 
@@ -98,7 +94,7 @@ final class DetailViewModel {
             let tv = try await detail
             let (fetchedImages, similarResult, providerResult) = await (images, similarList, providers)
 
-            tvDetail = tv
+            content = .tv(tv)
             similar = similarResult?.stamping(.tv)
             watchProviders = Self.pickRegion(from: providerResult)
 
@@ -125,7 +121,7 @@ final class DetailViewModel {
             let person = try await detail
             let (fetchedImages, creditsResult) = await (images, credits)
 
-            personDetail = person
+            content = .person(person)
             knownFor = Self.topCredits(from: creditsResult)
 
             guard let hero = HeroUIModelMapper.map(person, images: fetchedImages) else {

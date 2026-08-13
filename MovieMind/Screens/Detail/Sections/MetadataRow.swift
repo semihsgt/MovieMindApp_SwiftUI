@@ -7,21 +7,15 @@
 
 import SwiftUI
 
-/// Year • runtime • rating • status, separated by dots.
+/// Year • runtime • rating • status, under the detail hero.
 struct MetadataRow: View {
 
     let items: [String]
 
     var body: some View {
         if !items.isEmpty {
-            HStack(spacing: 6) {
-                ForEach(items.indices, id: \.self) { index in
-                    if index > 0 {
-                        Text("•").foregroundStyle(.white.opacity(0.4))
-                    }
-                    Text(items[index])
-                        .lineLimit(1)
-                }
+            HStack {
+                DotSeparatedText(items: items)
                 Spacer()
             }
             .font(.subheadline)

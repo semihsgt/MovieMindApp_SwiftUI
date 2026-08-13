@@ -38,13 +38,13 @@ enum AIError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .missingKey: return "Gemini API key is not configured."
-        case .invalidURL: return "Invalid Gemini URL address."
-        case .invalidResponse: return "An invalid response was received from Gemini."
-        case .modelUnavailable: return "No supported Gemini model is available for this key."
-        case .emptyResponse: return "Gemini returned no usable content."
-        case .decodingError(let error): return "Gemini decoding error: \(error.localizedDescription)"
-        case .quotaExceeded: return "You've reached today's free AI usage limit. Please try again later."
+        case .missingKey: "Gemini API key is not configured."
+        case .invalidURL: "Invalid Gemini URL address."
+        case .invalidResponse: "An invalid response was received from Gemini."
+        case .modelUnavailable: "No supported Gemini model is available for this key."
+        case .emptyResponse: "Gemini returned no usable content."
+        case .decodingError(let error): "Gemini decoding error: \(error.localizedDescription)"
+        case .quotaExceeded: "You've reached today's free AI usage limit. Please try again later."
         }
     }
 }

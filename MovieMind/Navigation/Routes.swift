@@ -37,10 +37,10 @@ enum LibraryRoute: Hashable {
 
     var title: String {
         switch self {
-        case .all: return "All Saved"
-        case .category(.movie): return "Movies"
-        case .category(.tv): return "TV Shows"
-        case .category(.person): return "People"
+        case .all: "All Saved"
+        case .category(.movie): "Movies"
+        case .category(.tv): "TV Shows"
+        case .category(.person): "People"
         }
     }
 

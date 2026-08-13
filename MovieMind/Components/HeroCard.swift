@@ -23,10 +23,10 @@ struct HeroCard: View {
     
     private var mediaTypeLabel: String {
         switch mediaType {
-        case .person: return "Person"
-        case .tv: return "TV"
-        case .movie: return "Movie"
-        case .none: return ""
+        case .person: "Person"
+        case .tv: "TV"
+        case .movie: "Movie"
+        case .none: ""
         }
     }
     
@@ -135,47 +135,27 @@ struct HeroCard: View {
             .padding(.horizontal, 25)
     }
 
-    @ViewBuilder
     private var subtitleView: some View {
+        DotSeparatedText(items: subtitleItems)
+    }
+
+    /// People read "Person • Acting • Known for …", titles read
+    /// "Movie • Drama • Thriller • 18+".
+    private var subtitleItems: [String] {
         switch mediaType {
         case .person:
-            HStack(spacing: 6) {
-                Text(mediaTypeLabel)
+            let known = item.result.knownFor.first?.displayName ?? ""
+            return [mediaTypeLabel,
+                    item.result.knownForDepartment,
+                    known.isEmpty ? nil : "Known for \(known)"].compactMap { $0 }
 
-                if let department = item.result.knownForDepartment {
-                    Text("•")
-                    Text(department)
-                }
-
-                if let topKnown = item.result.knownFor.first {
-                    let topTitle = topKnown.displayName
-                    if !topTitle.isEmpty {
-                        Text("•")
-                        Text("Known for \(topTitle)")
-                            .lineLimit(1)
-                    }
-                }
-            }
-
-        case .tv, .movie:
-            HStack(spacing: 6) {
-                Text(mediaTypeLabel)
-
-                ForEach(Array(item.genreNames.prefix(2)), id: \.self) { genreName in
-                    Text("•")
-                    Text(genreName)
-                }
-
-                if item.result.adult {
-                    Text("•")
-                    Text("18+")
-                        .foregroundStyle(.red)
-                        .fontWeight(.bold)
-                }
-            }
+        case .movie, .tv:
+            return [mediaTypeLabel]
+                + Array(item.genreNames.prefix(2))
+                + (item.result.adult ? ["18+"] : [])
 
         case .none:
-            EmptyView()
+            return []
         }
     }
 

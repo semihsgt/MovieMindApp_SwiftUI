@@ -20,15 +20,15 @@ enum NetworkError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .missingKey: return "TMDB API key is not configured. Copy SecretsExample.xcconfig as Secrets.xcconfig and add your key."
-        case .unauthorized: return "TMDB rejected the API key. Check the TMDB_API_KEY value in Secrets.xcconfig."
-        case .notFound: return "This title is no longer available on TMDB."
-        case .rateLimited: return "Too many requests to TMDB. Please try again in a moment."
-        case .invalidURL: return "Invalid URL address."
-        case .invalidResponse: return "An invalid response was received from the server."
-        case .incompleteData: return "Details could not be loaded."
-        case .decodingError(let error): return "Data decoding error: \(error.localizedDescription)"
-        case .unsupportedMediaType: return "This content type does not support the requested resource."
+        case .missingKey: "TMDB API key is not configured. Copy SecretsExample.xcconfig as Secrets.xcconfig and add your key."
+        case .unauthorized: "TMDB rejected the API key. Check the TMDB_API_KEY value in Secrets.xcconfig."
+        case .notFound: "This title is no longer available on TMDB."
+        case .rateLimited: "Too many requests to TMDB. Please try again in a moment."
+        case .invalidURL: "Invalid URL address."
+        case .invalidResponse: "An invalid response was received from the server."
+        case .incompleteData: "Details could not be loaded."
+        case .decodingError(let error): "Data decoding error: \(error.localizedDescription)"
+        case .unsupportedMediaType: "This content type does not support the requested resource."
         }
     }
 }
@@ -103,43 +103,21 @@ actor NetworkManager: ListServicing, SearchServicing, GenreServicing,
     }
 
     func fetchDetails<T: Decodable & Sendable>(id: Int, for mediaType: MediaType) async throws -> T {
-        let endpoint: DetailEndpoint
-        switch mediaType {
-        case .movie:  endpoint = .movieDetails(id: id)
-        case .tv:     endpoint = .tvDetails(id: id)
-        case .person: endpoint = .peopleDetails(id: id)
-        }
-        return try await performCall(for: endpoint)
+        try await performCall(for: MediaEndpoint.details(mediaType, id: id))
     }
 
     func fetchImages(id: Int, for mediaType: MediaType) async throws -> Images {
-        let endpoint: ImageEndpoint
-        switch mediaType {
-        case .movie:  endpoint = .movieImages(id: id)
-        case .tv:     endpoint = .tvImages(id: id)
-        case .person: endpoint = .personImages(id: id)
-        }
-        return try await performCall(for: endpoint)
+        try await performCall(for: MediaEndpoint.images(mediaType, id: id))
     }
 
     func fetchSimilar(id: Int, for mediaType: MediaType) async throws -> ListRespond {
-        let endpoint: SimilarEndpoint
-        switch mediaType {
-        case .movie:  endpoint = .movieSimilar(id: id)
-        case .tv:     endpoint = .tvSimilar(id: id)
-        case .person: throw NetworkError.unsupportedMediaType
-        }
-        return try await performCall(for: endpoint)
+        guard mediaType != .person else { throw NetworkError.unsupportedMediaType }
+        return try await performCall(for: MediaEndpoint.similar(mediaType, id: id))
     }
 
     func fetchWatchProviders(id: Int, for mediaType: MediaType) async throws -> WatchProviderResponse {
-        let endpoint: WatchProviderEndpoint
-        switch mediaType {
-        case .movie:  endpoint = .movieProviders(id: id)
-        case .tv:     endpoint = .tvProviders(id: id)
-        case .person: throw NetworkError.unsupportedMediaType
-        }
-        return try await performCall(for: endpoint)
+        guard mediaType != .person else { throw NetworkError.unsupportedMediaType }
+        return try await performCall(for: MediaEndpoint.watchProviders(mediaType, id: id))
     }
 
     func fetchPersonCredits(id: Int) async throws -> CombinedCredits {

@@ -68,12 +68,11 @@ struct DetailView: View {
     @ViewBuilder
     private func detailContent(for hero: HeroUIModel) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            if let movie = viewModel.movieDetail {
-                movieSections(movie, hero: hero)
-            } else if let tv = viewModel.tvDetail {
-                tvSections(tv, hero: hero)
-            } else if let person = viewModel.personDetail {
-                personSections(person)
+            switch viewModel.content {
+            case .movie(let movie):   movieSections(movie, hero: hero)
+            case .tv(let tv):         tvSections(tv, hero: hero)
+            case .person(let person): personSections(person)
+            case .none:               EmptyView()
             }
 
             WatchProvidersSection(providers: viewModel.watchProviders)
