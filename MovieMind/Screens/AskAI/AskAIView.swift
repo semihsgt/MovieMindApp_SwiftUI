@@ -84,7 +84,7 @@ struct AskAIView: View {
                 .font(.system(size: 40))
                 .foregroundStyle(.red)
 
-            Text("Ask MovieMind AI")
+            Text("Ask Movie Mind AI")
                 .font(.title2.bold())
                 .fontDesign(.rounded)
 

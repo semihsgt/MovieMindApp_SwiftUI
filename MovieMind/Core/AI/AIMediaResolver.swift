@@ -11,6 +11,18 @@ struct AIRecommendation: Decodable, Sendable {
     let title: String
     let year: String?
     let mediaType: String
+
+    /// The shape both the chat and the recommendation service ask Gemini for.
+    static let schema = JSONSchema.object(
+        properties: [
+            ("title", .string),
+            ("year", .string),
+            ("mediaType", .string)
+        ],
+        required: ["title", "mediaType"]
+    )
+
+    static let listSchema = JSONSchema.array(items: schema)
 }
 
 /// Turns the titles the AI replies with into real TMDB items.

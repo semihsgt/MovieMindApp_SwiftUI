@@ -20,7 +20,7 @@ struct AIShortcutCard: View {
                     .background(.red.gradient, in: RoundedRectangle(cornerRadius: 14))
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Ask MovieMind AI")
+                    Text("Ask Movie Mind AI")
                         .font(.headline)
                         .fontDesign(.rounded)
                         .foregroundStyle(.white)

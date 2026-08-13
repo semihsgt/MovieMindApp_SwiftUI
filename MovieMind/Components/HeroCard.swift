@@ -88,7 +88,7 @@ struct HeroCard: View {
 
     @ViewBuilder
     private var backgroundImageView: some View {
-        if let posterPath {
+        if let posterPath, !posterPath.isEmpty {
             AsyncPoster(path: posterPath, contentMode: .fill, cornerRadius: 0, size: .w780)
         } else {
             Rectangle().fill(Color.black.opacity(0.8))

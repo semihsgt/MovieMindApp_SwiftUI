@@ -39,22 +39,20 @@ actor GeminiService: AIServicing {
                                               as type: T.Type) async throws -> T {
         guard let apiKey = Secrets.geminiApiKey else { throw AIError.missingKey }
 
-        let candidates = resolvedModel.map { [$0] } ?? modelCandidates
-        var lastError: Error = AIError.modelUnavailable
-
-        for model in candidates {
+        // Try the candidates in order and remember the first one the key can use.
+        // Any error other than "this model isn't available" is the caller's problem.
+        for model in resolvedModel.map({ [$0] }) ?? modelCandidates {
             do {
                 let result = try await send(contents: contents, systemInstruction: systemInstruction,
                                             schema: schema, model: model, apiKey: apiKey, as: T.self)
                 resolvedModel = model
                 return result
             } catch AIError.modelUnavailable {
-                lastError = AIError.modelUnavailable
                 continue
             }
         }
 
-        throw lastError
+        throw AIError.modelUnavailable
     }
 
     private func send<T: Decodable & Sendable>(contents: [GeminiRequest.Content],

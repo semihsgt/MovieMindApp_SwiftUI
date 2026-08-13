@@ -38,14 +38,7 @@ actor AIChatService: AIChatServicing {
         let schema = JSONSchema.object(
             properties: [
                 ("reply", .string),
-                ("titles", .array(items: .object(
-                    properties: [
-                        ("title", .string),
-                        ("year", .string),
-                        ("mediaType", .string)
-                    ],
-                    required: ["title", "mediaType"]
-                )))
+                ("titles", AIRecommendation.listSchema)
             ],
             required: ["reply"]
         )
@@ -62,7 +55,7 @@ actor AIChatService: AIChatServicing {
     }
 
     private static let systemInstruction = """
-    You are MovieMind's built-in movie and TV recommendation assistant. Interpret the user's \
+    You are Movie Mind's built-in movie and TV recommendation assistant. Interpret the user's \
     request, which may mention mood, genre, era, actors, or a title they liked, and suggest \
     relevant, well-known movies or TV shows. Reply in the same language the user writes in, \
     using a short and warm conversational tone of one to three sentences. Put your spoken \

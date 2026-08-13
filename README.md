@@ -1,4 +1,4 @@
-# 🎬 MovieMind
+# 🎬 Movie Mind
 
 An AI-powered movie, TV show & people exploration app for iOS. Discover what to watch through natural-language recommendations from [Google Gemini](https://ai.google.dev), backed by real [TMDB](https://www.themoviedb.org) data.
 Built with SwiftUI, Swift Concurrency, and SwiftData.
@@ -27,7 +27,7 @@ Built with SwiftUI, Swift Concurrency, and SwiftData.
 
 ## AI, without the hallucinations
 
-MovieMind uses Gemini AI models. The model never invents database IDs, posters, or ratings — it only proposes titles, which are then resolved against TMDB in a second step:
+Movie Mind uses Gemini AI models. The model never invents database IDs, posters, or ratings — it only proposes titles, which are then resolved against TMDB in a second step:
 
 ```
 Library / prompt ──▶ Gemini (structured JSON)         ──▶ TMDB search ──▶ real MediaItem

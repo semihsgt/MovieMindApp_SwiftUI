@@ -42,6 +42,12 @@ final class HomeViewModel {
 
     private var trendingAll: ListRespond?
 
+    // What each rail is actually showing, so a failed switch can put the
+    // picker back and an unchanged selection doesn't refetch.
+    private var loadedTrendingType: MediaTypeForPicker = .movie
+    private var loadedTopRatedType: MediaTypeForPicker = .movie
+    private var loadedPopularType: MediaTypeForPicker = .movie
+
     private let networkService: ListServicing & MediaImageServicing
     private let genreStore: GenreProviding
 
@@ -65,7 +71,7 @@ final class HomeViewModel {
             var heroItems = await buildHeroItems()
             heroItems = await withHeroImages(heroItems, in: 0..<Self.eagerHeroImageCount)
 
-            await prefetchPosterImages(heroItems: heroItems)
+            prefetchPosterImages(heroItems: heroItems)
             withAnimation(.easeInOut(duration: 0.4)) {
                 state = .loaded(heroItems)
             }
@@ -80,23 +86,23 @@ final class HomeViewModel {
         }
     }
 
-    private func prefetchPosterImages(heroItems: [HeroUIModel]) async {
-        await prefetchHeroImages(heroItems)
+    private func prefetchPosterImages(heroItems: [HeroUIModel]) {
+        prefetchHeroImages(heroItems)
 
         let listPaths = [nowPlayingM, trendingMT, topRatedMT, popularMT, airingT, popularP]
             .flatMap { posterPaths(in: $0) }
-        await ImagePrefetching.shared.prefetch(listPaths, size: .w500)
+        ImagePrefetching.shared.prefetch(listPaths, size: .w500)
     }
 
-    private func prefetchPosterImages(for list: ListRespond) async {
-        await ImagePrefetching.shared.prefetch(posterPaths(in: list), size: .w500)
+    private func prefetchPosterImages(for list: ListRespond) {
+        ImagePrefetching.shared.prefetch(posterPaths(in: list), size: .w500)
     }
 
-    private func prefetchHeroImages(_ items: [HeroUIModel]) async {
-        await ImagePrefetching.shared.prefetch(
+    private func prefetchHeroImages(_ items: [HeroUIModel]) {
+        ImagePrefetching.shared.prefetch(
             items.map { $0.images?.bestPoster ?? $0.result.displayPath }, size: .w780
         )
-        await ImagePrefetching.shared.prefetch(items.map { $0.images?.bestLogo() }, size: .w500)
+        ImagePrefetching.shared.prefetch(items.map { $0.images?.bestLogo() }, size: .w500)
     }
 
     private func posterPaths(in list: ListRespond?) -> [String] {
@@ -171,38 +177,78 @@ final class HomeViewModel {
               current.map(\.id) == items.map(\.id) else { return }
 
         state = .loaded(updated)
-        await prefetchHeroImages(Array(updated.dropFirst(Self.eagerHeroImageCount)))
+        prefetchHeroImages(Array(updated.dropFirst(Self.eagerHeroImageCount)))
     }
 
     func refetchSection(_ section: PickerSection) async {
-        guard case .loaded = state else { return }
+        guard case .loaded = state,
+              let type = selection(for: section),
+              type != loadedType(for: section) else { return }
 
         do {
-            switch section {
-            case .trending:
-                guard let type = trendingType else { return }
-                let result = try await networkService.fetchList(
-                    for: type == .movie ? .trendingMovies : .trendingTV
-                ).stamping(type == .movie ? .movie : .tv)
-                await prefetchPosterImages(for: result)
-                trendingMT = result
-            case .topRated:
-                guard let type = topRatedType else { return }
-                let result = try await networkService.fetchList(
-                    for: type == .movie ? .topRatedMovies : .topRatedTV
-                ).stamping(type == .movie ? .movie : .tv)
-                await prefetchPosterImages(for: result)
-                topRatedMT = result
-            case .popular:
-                guard let type = popularType else { return }
-                let result = try await networkService.fetchList(
-                    for: type == .movie ? .popularMovies : .popularTV
-                ).stamping(type == .movie ? .movie : .tv)
-                await prefetchPosterImages(for: result)
-                popularMT = result
-            }
+            let result = try await networkService
+                .fetchList(for: Self.endpoint(for: section, type: type))
+                .stamping(type == .movie ? .movie : .tv)
+
+            prefetchPosterImages(for: result)
+            store(result, for: section)
+            setLoadedType(type, for: section)
         } catch {
-            // Section keeps its previous content on failure
+            // The rail keeps its old content, so move the picker back onto it
+            // rather than showing a label that doesn't match what's on screen.
+            setSelection(loadedType(for: section), for: section)
+        }
+    }
+
+    private static func endpoint(for section: PickerSection,
+                                 type: MediaTypeForPicker) -> ListEndpoint {
+        switch (section, type) {
+        case (.trending, .movie): .trendingMovies
+        case (.trending, .tv):    .trendingTV
+        case (.topRated, .movie): .topRatedMovies
+        case (.topRated, .tv):    .topRatedTV
+        case (.popular, .movie):  .popularMovies
+        case (.popular, .tv):     .popularTV
+        }
+    }
+
+    private func selection(for section: PickerSection) -> MediaTypeForPicker? {
+        switch section {
+        case .trending: trendingType
+        case .topRated: topRatedType
+        case .popular:  popularType
+        }
+    }
+
+    private func setSelection(_ type: MediaTypeForPicker, for section: PickerSection) {
+        switch section {
+        case .trending: trendingType = type
+        case .topRated: topRatedType = type
+        case .popular:  popularType = type
+        }
+    }
+
+    private func loadedType(for section: PickerSection) -> MediaTypeForPicker {
+        switch section {
+        case .trending: loadedTrendingType
+        case .topRated: loadedTopRatedType
+        case .popular:  loadedPopularType
+        }
+    }
+
+    private func setLoadedType(_ type: MediaTypeForPicker, for section: PickerSection) {
+        switch section {
+        case .trending: loadedTrendingType = type
+        case .topRated: loadedTopRatedType = type
+        case .popular:  loadedPopularType = type
+        }
+    }
+
+    private func store(_ list: ListRespond, for section: PickerSection) {
+        switch section {
+        case .trending: trendingMT = list
+        case .topRated: topRatedMT = list
+        case .popular:  popularMT = list
         }
     }
 }

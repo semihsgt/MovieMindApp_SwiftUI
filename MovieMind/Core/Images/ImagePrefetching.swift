@@ -16,12 +16,13 @@ final class ImagePrefetching: @unchecked Sendable {
 
     init() {}
 
-    func prefetch(_ urls: [URL]) async {
+    /// Fire and forget: Nuke queues the downloads and returns immediately.
+    func prefetch(_ urls: [URL]) {
         prefetcher.startPrefetching(with: Array(Set(urls)))
     }
 
-    func prefetch(_ paths: [String?], size: TMDBImage.Size) async {
-        await prefetch(paths.compactMap { TMDBImage.url(for: $0, size: size) })
+    func prefetch(_ paths: [String?], size: TMDBImage.Size) {
+        prefetch(paths.compactMap { TMDBImage.url(for: $0, size: size) })
     }
 
     func cancelAll() {

@@ -8,39 +8,24 @@
 import SwiftUI
 import SwiftData
 
+/// Adds or removes one title from the library.
+///
+/// Membership is read from `savedLibraryKeys`, a single query shared by every
+/// button on screen; the store is only touched when the button is tapped.
 struct LibraryButton: View {
 
     @Environment(\.modelContext) private var modelContext
-    @Query private var savedItems: [LibraryItem]
+    @Environment(\.savedLibraryKeys) private var savedKeys
 
-    private let mediaId: Int
-    private let mediaType: MediaType
-    private let displayName: String
-    private let posterPath: String?
-    private let diameter: CGFloat
-    private let showsBackground: Bool
-    private var isSaved: Bool { !savedItems.isEmpty }
+    let mediaId: Int
+    let mediaType: MediaType
+    let displayName: String
+    let posterPath: String?
+    var diameter: CGFloat = 45
+    let showsBackground: Bool
 
-    init(mediaId: Int,
-         mediaType: MediaType,
-         displayName: String,
-         posterPath: String?,
-         diameter: CGFloat = 45,
-         showsBackground: Bool) {
-        self.mediaId = mediaId
-        self.mediaType = mediaType
-        self.displayName = displayName
-        self.posterPath = posterPath
-        self.diameter = diameter
-        self.showsBackground = showsBackground
-
-        let key = LibraryItem.key(id: mediaId, mediaType: mediaType)
-        var descriptor = FetchDescriptor<LibraryItem>(
-            predicate: #Predicate { $0.key == key }
-        )
-        descriptor.fetchLimit = 1
-        _savedItems = Query(descriptor)
-    }
+    private var key: String { LibraryItem.key(id: mediaId, mediaType: mediaType) }
+    private var isSaved: Bool { savedKeys.contains(key) }
 
     var body: some View {
         Button {
@@ -61,15 +46,22 @@ struct LibraryButton: View {
     }
 
     private func toggle() {
-        if let existing = savedItems.first {
-            modelContext.delete(existing)
+        if isSaved {
+            removeSaved()
         } else {
-            modelContext.insert(LibraryItem(
-                mediaId: mediaId,
-                mediaType: mediaType,
-                displayName: displayName,
-                posterPath: posterPath
-            ))
+            modelContext.insert(LibraryItem(mediaId: mediaId,
+                                            mediaType: mediaType,
+                                            displayName: displayName,
+                                            posterPath: posterPath))
         }
+    }
+
+    private func removeSaved() {
+        let key = key
+        var descriptor = FetchDescriptor<LibraryItem>(predicate: #Predicate { $0.key == key })
+        descriptor.fetchLimit = 1
+
+        guard let existing = try? modelContext.fetch(descriptor).first else { return }
+        modelContext.delete(existing)
     }
 }

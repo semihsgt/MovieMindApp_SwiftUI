@@ -32,18 +32,9 @@ actor AIRecommendationService: AIRecommending {
     func recommend(from seeds: [LibrarySeed]) async throws -> [MediaItem] {
         guard !seeds.isEmpty else { return [] }
 
-        let schema = JSONSchema.array(items: .object(
-            properties: [
-                ("title", .string),
-                ("year", .string),
-                ("mediaType", .string)
-            ],
-            required: ["title", "mediaType"]
-        ))
-
         let recommendations = try await ai.generate(
             prompt: Self.buildPrompt(seeds: seeds, limit: Self.recommendationLimit),
-            schema: schema,
+            schema: AIRecommendation.listSchema,
             as: [AIRecommendation].self
         )
 

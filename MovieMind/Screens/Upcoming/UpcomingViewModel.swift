@@ -44,7 +44,7 @@ final class UpcomingViewModel {
             let items = UpcomingUIModelMapper.map(combined, genres: genres)
 
             // One asset per card; both placements downsample from it locally.
-            await ImagePrefetching.shared.prefetch(items.map(\.result.displayPath), size: .w500)
+            ImagePrefetching.shared.prefetch(items.map(\.result.displayPath), size: .w500)
 
             withAnimation(.easeInOut(duration: 0.4)) {
                 state = .loaded(items)

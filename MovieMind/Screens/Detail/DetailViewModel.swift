@@ -75,7 +75,7 @@ final class DetailViewModel {
                 return missingDetail()
             }
 
-            await prefetchDetailImages(hero: hero,
+            prefetchDetailImages(hero: hero,
                                        castProfiles: movie.cast,
                                        collectionBackdrop: movie.belongsToCollection?.backdropPath)
             show(hero)
@@ -102,7 +102,7 @@ final class DetailViewModel {
                 return missingDetail()
             }
 
-            await prefetchDetailImages(hero: hero,
+            prefetchDetailImages(hero: hero,
                                        castProfiles: tv.cast,
                                        seasons: tv.seasons,
                                        episodeStills: tv.episodeStills)
@@ -128,7 +128,7 @@ final class DetailViewModel {
                 return missingDetail()
             }
 
-            await prefetchDetailImages(hero: hero, knownFor: knownFor)
+            prefetchDetailImages(hero: hero, knownFor: knownFor)
             show(hero)
         } catch {
             state = .failed(error)
@@ -170,9 +170,9 @@ final class DetailViewModel {
         collectionBackdrop: String? = nil,
         seasons: [Season] = [],
         episodeStills: [String?] = []
-    ) async {
-        await prefetcher.prefetch([hero.images?.bestPoster ?? hero.result.displayPath], size: .w780)
-        await prefetcher.prefetch([hero.images?.bestLogo()], size: .w500)
+    ) {
+        prefetcher.prefetch([hero.images?.bestPoster ?? hero.result.displayPath], size: .w780)
+        prefetcher.prefetch([hero.images?.bestLogo()], size: .w500)
 
         var thumbnails: [String?] = castProfiles.map(\.profilePath)
         thumbnails += seasons.map(\.posterPath)
@@ -183,7 +183,7 @@ final class DetailViewModel {
         posters += (similar?.results ?? []).map(\.displayPath)
         posters.append(collectionBackdrop)
 
-        await prefetcher.prefetch(thumbnails, size: .w200)
-        await prefetcher.prefetch(posters, size: .w500)
+        prefetcher.prefetch(thumbnails, size: .w200)
+        prefetcher.prefetch(posters, size: .w500)
     }
 }

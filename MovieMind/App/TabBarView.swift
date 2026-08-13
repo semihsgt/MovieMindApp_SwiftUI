@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct TabBarView: View {
 
@@ -28,6 +29,12 @@ struct TabBarView: View {
     }
     
     private var TabBarsView: some View {
+        SavedLibraryKeysProvider {
+            tabs
+        }
+    }
+
+    private var tabs: some View {
         TabView {
             HomeView()
                 .tabItem { Label("Home", systemImage: "house") }
@@ -43,4 +50,5 @@ struct TabBarView: View {
 
 #Preview {
     TabBarView()
+        .modelContainer(for: LibraryItem.self, inMemory: true)
 }

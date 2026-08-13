@@ -9,6 +9,9 @@ import Foundation
 
 enum NetworkError: Error, LocalizedError {
     case missingKey
+    case unauthorized
+    case notFound
+    case rateLimited
     case invalidURL
     case invalidResponse
     case incompleteData
@@ -18,6 +21,9 @@ enum NetworkError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingKey: return "TMDB API key is not configured. Copy SecretsExample.xcconfig as Secrets.xcconfig and add your key."
+        case .unauthorized: return "TMDB rejected the API key. Check the TMDB_API_KEY value in Secrets.xcconfig."
+        case .notFound: return "This title is no longer available on TMDB."
+        case .rateLimited: return "Too many requests to TMDB. Please try again in a moment."
         case .invalidURL: return "Invalid URL address."
         case .invalidResponse: return "An invalid response was received from the server."
         case .incompleteData: return "Details could not be loaded."
@@ -62,9 +68,16 @@ actor NetworkManager: ListServicing, SearchServicing, GenreServicing,
 
         let (data, response) = try await URLSession.shared.data(from: url)
 
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
+        guard let httpResponse = response as? HTTPURLResponse else {
             throw NetworkError.invalidResponse
+        }
+
+        switch httpResponse.statusCode {
+        case 200...299: break
+        case 401, 403:  throw NetworkError.unauthorized
+        case 404:       throw NetworkError.notFound
+        case 429:       throw NetworkError.rateLimited
+        default:        throw NetworkError.invalidResponse
         }
 
         do {

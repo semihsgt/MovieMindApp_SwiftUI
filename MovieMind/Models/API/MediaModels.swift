@@ -19,7 +19,6 @@ struct GenreResponse: Decodable, Sendable {
 
 struct ListRespond: Decodable, Sendable {
     @Fallback var results: [MediaItem] = []
-    let page: Int?
     let totalPages: Int?
 }
 
@@ -32,7 +31,7 @@ extension ListRespond {
             copy.mediaType = mediaType
             return copy
         }
-        return ListRespond(results: stamped, page: page, totalPages: totalPages)
+        return ListRespond(results: stamped, totalPages: totalPages)
     }
 }
 

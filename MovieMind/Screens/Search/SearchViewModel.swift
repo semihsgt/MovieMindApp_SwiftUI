@@ -68,7 +68,7 @@ final class SearchViewModel {
     }
 
     func loadMoreIfNeeded(currentItem: MediaItem) async {
-        guard case .loaded(var items) = state,
+        guard case .loaded(let items) = state,
               !isLoadingMore,
               currentPage < totalPages,
               let index = items.firstIndex(where: { $0.id == currentItem.id }),
@@ -77,21 +77,29 @@ final class SearchViewModel {
         isLoadingMore = true
         defer { isLoadingMore = false }
 
-        do {
-            let nextPage = currentPage + 1
-            let response = try await networkService.fetchSearch(
-                for: .searchMulti(query: activeQuery, page: nextPage)
-            )
-            currentPage = nextPage
-            totalPages = response.totalPages ?? totalPages
+        let query = activeQuery
+        let nextPage = currentPage + 1
 
-            let existingIds = Set(items.compactMap(\.id))
+        do {
+            let response = try await networkService.fetchSearch(
+                for: .searchMulti(query: query, page: nextPage)
+            )
+
+            // A new search can start while this page is in flight. Cancelling the
+            // row's task usually gets here first, but not once the response has
+            // already landed — so re-read the state instead of trusting the copy.
+            guard query == activeQuery,
+                  case .loaded(let current) = state else { return }
+
+            let existingIds = Set(current.compactMap(\.id))
             let newItems = response.results.filter {
                 guard let id = $0.id else { return false }
                 return !existingIds.contains(id)
             }
-            items.append(contentsOf: newItems)
-            state = .loaded(items)
+
+            currentPage = nextPage
+            totalPages = response.totalPages ?? totalPages
+            state = .loaded(current + newItems)
         } catch {
             // Keep the pages already loaded
         }

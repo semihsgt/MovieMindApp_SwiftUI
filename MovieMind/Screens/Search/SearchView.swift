@@ -18,7 +18,7 @@ struct SearchView: View {
                 switch viewModel.state {
                 case .idle:
                     ContentUnavailableView(
-                        "Explore MovieMind",
+                        "Explore Movie Mind",
                         systemImage: "magnifyingglass",
                         description: Text("Search for movies, TV shows, or people.")
                     )
