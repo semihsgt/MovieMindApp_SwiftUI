@@ -32,10 +32,15 @@ private struct ZoomSourceModifier<ID: Hashable>: ViewModifier {
 }
 
 extension View {
+
+    /// Publishes the screen's namespace so nested views can mark themselves as a
+    /// zoom source without it being threaded through every initializer.
     func zoomNamespace(_ namespace: Namespace.ID) -> some View {
         environment(\.zoomNamespace, namespace)
     }
 
+    /// Marks this view as the thing the pushed screen zooms out of. Does nothing
+    /// when no namespace is in the environment.
     func zoomSource<ID: Hashable>(id: ID) -> some View {
         modifier(ZoomSourceModifier(id: id))
     }

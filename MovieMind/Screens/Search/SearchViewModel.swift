@@ -24,6 +24,10 @@ final class SearchViewModel {
         self.networkService = networkService
     }
 
+    /// Debounces typing by 500 ms before searching.
+    ///
+    /// Driven by `.task(id: searchText)`, so SwiftUI cancels the previous call on
+    /// every keystroke and only the last one survives the sleep.
     func searchTextChanged() async {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -67,6 +71,7 @@ final class SearchViewModel {
         }
     }
 
+    /// Fetches the next page once the user is within five rows of the end.
     func loadMoreIfNeeded(currentItem: MediaItem) async {
         guard case .loaded(let items) = state,
               !isLoadingMore,

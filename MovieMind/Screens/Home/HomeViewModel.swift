@@ -128,6 +128,13 @@ final class HomeViewModel {
         self.popularMT = popMTR?.stamping(.movie)
         self.airingT = airTR?.stamping(.tv)
         self.popularP = popPR?.stamping(.person)
+
+        // Every switchable rail comes back as movies here, so the "what is on
+        // screen" markers have to agree — otherwise a reload with the picker on
+        // TV would skip the refetch and leave the label lying about the content.
+        loadedTrendingType = .movie
+        loadedTopRatedType = .movie
+        loadedPopularType = .movie
     }
 
     private func buildHeroItems() async -> [HeroUIModel] {
@@ -180,6 +187,11 @@ final class HomeViewModel {
         prefetchHeroImages(Array(updated.dropFirst(Self.eagerHeroImageCount)))
     }
 
+    /// Reloads one rail after its Movie/TV picker changes.
+    ///
+    /// Does nothing when the selection already matches what is on screen. On failure
+    /// the rail keeps its content and the picker moves back onto it, so the label
+    /// never claims something the list isn't showing.
     func refetchSection(_ section: PickerSection) async {
         guard case .loaded = state,
               let type = selection(for: section),

@@ -7,6 +7,8 @@
 
 import Foundation
 
+/// The response shape sent to Gemini as `responseSchema`, which is what makes the
+/// model reply with parseable JSON instead of prose.
 indirect enum JSONSchema: Sendable {
     case string
     case integer
@@ -16,6 +18,8 @@ indirect enum JSONSchema: Sendable {
     case object(properties: [(String, JSONSchema)], required: [String])
 }
 
+/// Gemini's dialect, not plain JSON Schema: uppercase type names, and an explicit
+/// `propertyOrdering` because a Swift dictionary would otherwise scramble the keys.
 extension JSONSchema: Encodable {
     private enum CodingKeys: String, CodingKey {
         case type, items, properties, required, propertyOrdering

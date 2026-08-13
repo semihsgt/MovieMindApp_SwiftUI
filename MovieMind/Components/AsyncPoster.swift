@@ -10,6 +10,11 @@ import UIKit
 import Nuke
 import NukeUI
 
+/// Every poster, profile photo and provider logo in the app.
+///
+/// Decodes at the size it is drawn at rather than the size it was downloaded at,
+/// and retries a failed load twice with growing delays before giving up on the
+/// placeholder.
 struct AsyncPoster: View {
     
     let path: String?

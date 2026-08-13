@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// The shared failure screen: what went wrong plus a button that re-runs the load.
 struct ErrorRetryView: View {
     
     let error: Error
@@ -26,6 +27,9 @@ struct ErrorRetryView: View {
     }
 }
 
+/// Renders a `ViewState` so screens never branch on it themselves: the caller
+/// supplies a skeleton and the loaded content, and gets the idle, loading and
+/// failure cases handled the same way everywhere.
 struct StateContainerView<Value, Loading: View, Content: View>: View {
     let state: ViewState<Value>
     let retryAction: () async -> Void

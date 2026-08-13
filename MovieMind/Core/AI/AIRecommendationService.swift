@@ -29,6 +29,10 @@ actor AIRecommendationService: AIRecommending {
         self.network = network
     }
 
+    /// Titles the user is likely to enjoy, grounded in TMDB.
+    ///
+    /// Gemini only proposes names; ids, posters and ratings always come from a real
+    /// TMDB lookup afterwards, so the model can never invent a piece of catalogue data.
     func recommend(from seeds: [LibrarySeed]) async throws -> [MediaItem] {
         guard !seeds.isEmpty else { return [] }
 

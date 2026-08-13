@@ -28,6 +28,8 @@ final class DetailViewModel {
         self.networkService = networkService
     }
 
+    /// Loads once per title. Safe to call from `.task`, which re-fires on every
+    /// return to the screen; use `load` directly to force a retry.
     func loadIfNeeded(id: Int, mediaType: MediaType) async {
         let key = "\(mediaType.rawValue)-\(id)"
         guard key != loadedKey else { return }
@@ -35,6 +37,8 @@ final class DetailViewModel {
         await load(id: id, mediaType: mediaType)
     }
 
+    /// Called on disappear so images for a screen the user left don't compete with
+    /// the one they moved to.
     func cancelPrefetching() {
         prefetcher.cancelAll()
     }

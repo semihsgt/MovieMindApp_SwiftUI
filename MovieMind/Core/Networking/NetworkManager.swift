@@ -33,6 +33,9 @@ enum NetworkError: Error, LocalizedError {
     }
 }
 
+/// Every TMDB request funnels through this actor: one place that holds the key,
+/// builds the URL, maps status codes to `NetworkError` and decodes the response.
+/// Callers depend on the narrow protocols above it, never on the actor itself.
 actor NetworkManager: ListServicing, SearchServicing, GenreServicing,
                       MediaImageServicing, DetailServicing, CollectionServicing {
 

@@ -7,8 +7,8 @@
 
 import Foundation
 
-/// The detail responses turned into the strings the UI shows.
-/// Kept out of the views: no layout here, just data.
+// The detail responses turned into the strings the UI shows.
+// Kept out of the views: no layout here, just data.
 
 extension MovieDetail {
 

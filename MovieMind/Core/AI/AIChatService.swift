@@ -13,6 +13,9 @@ struct AIChatResult: Sendable {
 }
 
 protocol AIChatServicing: Sendable {
+
+    /// Sends the conversation so far and returns the reply plus any titles it
+    /// mentioned, already resolved against TMDB.
     func send(history: [AIChatTurn]) async throws -> AIChatResult
 }
 

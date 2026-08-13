@@ -28,6 +28,11 @@ struct AIRecommendation: Decodable, Sendable {
 /// Turns the titles the AI replies with into real TMDB items.
 enum AIMediaResolver {
 
+    /// Searches TMDB for each title in parallel and keeps the model's ordering.
+    ///
+    /// Titles that match nothing are dropped, duplicates and anything in `excluded`
+    /// are filtered out — so a hallucinated name simply disappears instead of
+    /// reaching the UI as an empty card.
     static func resolve(_ recommendations: [AIRecommendation],
                         excludingTitles excluded: Set<String> = [],
                         using network: SearchServicing) async -> [MediaItem] {

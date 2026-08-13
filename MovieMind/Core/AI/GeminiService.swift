@@ -7,6 +7,11 @@
 
 import Foundation
 
+/// Gemini client for both AI features.
+///
+/// The candidate list exists because model availability differs per key and per
+/// tier; the first one that answers is remembered for the rest of the session so
+/// later calls don't pay for the probing again.
 actor GeminiService: AIServicing {
 
     static let shared = GeminiService()

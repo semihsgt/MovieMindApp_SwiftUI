@@ -7,6 +7,9 @@
 
 import Foundation
 
+/// One TMDB call, described as data. The API key and base URL are added by
+/// `NetworkManager`, so a new call is just another case with a path and,
+/// where needed, its query items.
 protocol Endpoint {
     var path: String { get }
     var queryItems: [URLQueryItem] { get }

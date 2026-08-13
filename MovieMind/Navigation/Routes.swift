@@ -7,11 +7,16 @@
 
 import Foundation
 
+/// Where a poster leads. Views push a value and let the `NavigationStack` build
+/// the destination, so leaf views stay unaware of what they navigate to.
 struct MediaRoute: Hashable {
     let id: Int
     let mediaType: MediaType
+    /// Which rail the tap came from. The same title can appear in several rails at
+    /// once, and the zoom transition needs one unambiguous source view.
     var sourceKey: String?
 
+    /// Nil when the row has no id, i.e. when there is nothing to navigate to.
     init?(item: MediaItem, sourceKey: String? = nil) {
         guard let id = item.id else { return nil }
         self.id = id

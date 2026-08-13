@@ -7,8 +7,8 @@
 
 import Foundation
 
-/// Narrow, per-screen contracts instead of one shared "everything" protocol,
-/// so a caller only sees the calls it actually makes and a test only mocks those.
+// Narrow, per-screen contracts instead of one shared "everything" protocol,
+// so a caller only sees the calls it actually makes and a test only mocks those.
 
 protocol ListServicing: Sendable {
     func fetchList(for endpoint: ListEndpoint) async throws -> ListRespond

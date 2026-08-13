@@ -18,7 +18,12 @@ struct AIChatTurn: Sendable {
 }
 
 protocol AIServicing: Sendable {
+
+    /// One-shot prompt with no history — used by the recommendation service.
     func generate<T: Decodable & Sendable>(prompt: String, schema: JSONSchema, as type: T.Type) async throws -> T
+
+    /// A whole conversation. Gemini is stateless, so the caller re-sends the turns
+    /// it wants the model to remember.
     func chat<T: Decodable & Sendable>(turns: [AIChatTurn], systemInstruction: String?, schema: JSONSchema, as type: T.Type) async throws -> T
 }
 

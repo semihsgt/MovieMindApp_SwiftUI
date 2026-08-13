@@ -30,6 +30,10 @@ struct HeroCard: View {
         }
     }
     
+    /// TMDB's default poster usually has the title printed on the artwork, while the
+    /// language-neutral one does not. Drawing the logo over the former would show the
+    /// name twice, so it is only drawn when a textless poster was found — or for
+    /// people, whose photos never carry a name.
     private var shouldShowTitle: Bool {
         mediaType == .person || posterPath != item.result.displayPath
     }
