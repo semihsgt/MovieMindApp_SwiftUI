@@ -46,17 +46,7 @@ struct SearchView: View {
                 placement: .navigationBarDrawer(displayMode: .always),
                 prompt: "Movies, TV Shows, People..."
             )
-            .navigationDestination(for: MediaRoute.self) { route in
-                DetailView(id: route.id, mediaType: route.mediaType)
-                    .zoomDestination(id: route, in: zoomNamespace)
-            }
-            .navigationDestination(for: CollectionRoute.self) { route in
-                CollectionView(route: route)
-                    .zoomDestination(id: route, in: zoomNamespace)
-            }
-            .navigationDestination(for: AskAIRoute.self) { route in
-                AskAIView(initialQuery: route.query)
-            }
+            .appDestinations(in: zoomNamespace)
         }
         .zoomNamespace(zoomNamespace)
         .task(id: viewModel.searchText) {
@@ -140,54 +130,6 @@ struct SearchView: View {
             .background(Color(.secondarySystemBackground).opacity(0.5), in: RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
-    }
-}
-
-struct SearchRowView: View {
-    let item: MediaItem
-
-    var body: some View {
-        HStack(spacing: 14) {
-
-            AsyncPoster(path: item.displayPath, width: 70, height: 105, cornerRadius: 12, size: .w200)
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text(item.displayName)
-                    .font(.headline)
-                    .fontDesign(.rounded)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-
-                HStack {
-                    if item.voteAverage > 0 {
-                        HStack(spacing: 4) {
-                            Image(systemName: "star.fill")
-                                .foregroundStyle(.yellow)
-                                .font(.caption)
-
-                            Text(String(format: "%.1f", item.voteAverage))
-                                .font(.caption.bold())
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    if let year = item.displayDate?.releaseYear {
-                        Text(year)
-                            .font(.caption.bold())
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-
-            Spacer()
-
-            Image(systemName: "chevron.right")
-                .foregroundStyle(.tertiary)
-                .padding(.horizontal, 5)
-
-        }
-        .padding(8)
-        .background(Color(.secondarySystemBackground).opacity(0.5), in: RoundedRectangle(cornerRadius: 16))
     }
 }
 

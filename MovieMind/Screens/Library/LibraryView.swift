@@ -38,16 +38,9 @@ struct LibraryView: View {
                 }
             }
             .navigationTitle("Library")
-            .navigationDestination(for: MediaRoute.self) { route in
-                DetailView(id: route.id, mediaType: route.mediaType)
-                    .zoomDestination(id: route, in: zoomNamespace)
-            }
+            .appDestinations(in: zoomNamespace)
             .navigationDestination(for: LibraryRoute.self) { route in
                 LibraryListView(filter: route.filter, title: route.title)
-            }
-            .navigationDestination(for: CollectionRoute.self) { route in
-                CollectionView(route: route)
-                    .zoomDestination(id: route, in: zoomNamespace)
             }
         }
         .zoomNamespace(zoomNamespace)

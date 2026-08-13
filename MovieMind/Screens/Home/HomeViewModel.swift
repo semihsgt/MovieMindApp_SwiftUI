@@ -8,12 +8,6 @@
 import Foundation
 import SwiftUI
 
-enum MediaTypeForPicker: String, CaseIterable, Identifiable {
-    case movie = "Movie"
-    case tv = "TV"
-    var id: Self { self }
-}
-
 enum PickerSection {
     case trending
     case topRated

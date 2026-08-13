@@ -43,17 +43,7 @@ struct HomeView: View {
                 homeContent(heroItems)
             }
             .navigationTitle("Home")
-            .navigationDestination(for: MediaRoute.self) { route in
-                DetailView(id: route.id, mediaType: route.mediaType)
-                    .zoomDestination(id: route, in: zoomNamespace)
-            }
-            .navigationDestination(for: CollectionRoute.self) { route in
-                CollectionView(route: route)
-                    .zoomDestination(id: route, in: zoomNamespace)
-            }
-            .navigationDestination(for: AskAIRoute.self) { route in
-                AskAIView(initialQuery: route.query)
-            }
+            .appDestinations(in: zoomNamespace)
             .toolbar(.hidden, for: .navigationBar)
             .toolbarBackground(.hidden, for: .navigationBar)
         }
