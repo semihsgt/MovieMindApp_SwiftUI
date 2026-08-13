@@ -29,6 +29,10 @@ struct HeroCard: View {
         case .none: return ""
         }
     }
+    
+    private var shouldShowTitle: Bool {
+        mediaType == .person || posterPath != item.result.displayPath
+    }
 
     init(item: HeroUIModel, isButtonDisplayed: Bool = true) {
         self.item = item
@@ -55,8 +59,10 @@ struct HeroCard: View {
                 VStack(spacing: 0) {
                     Spacer()
 
-                    titleView
-                        .padding(.bottom, 8)
+                    if shouldShowTitle {
+                        titleView
+                            .padding(.bottom, 8)
+                    }
 
                     subtitleView
                         .shadow(radius: 10)
@@ -71,7 +77,7 @@ struct HeroCard: View {
                 .padding(.horizontal)
                 .padding(.bottom, 30)
                 
-            } else if mediaType != .person {
+            } else if shouldShowTitle {
                 
                 VStack(spacing: 0) {
                     Spacer()
