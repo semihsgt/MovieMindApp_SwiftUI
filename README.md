@@ -9,7 +9,7 @@ Movie Mind is an AI-powered movie, TV show and people exploration app. You can d
 ![AI](https://img.shields.io/badge/AI-Gemini-D8C2AA?labelColor=5C4A3E&logo=googlegemini&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-D8C2AA?labelColor=5C4A3E&logo=github&logoColor=white)
 
-PIC HERE
+<img width="1920" height="1080" alt="screenshots" src="https://github.com/user-attachments/assets/1c9cd259-b727-43b5-a478-fefd9e4059a9" />
 
 ## Features
 
@@ -22,7 +22,7 @@ PIC HERE
 
 ## App Preview
 
-VID HERE
+https://github.com/user-attachments/assets/92ff4eb4-040f-4bce-b6d2-374c0db858f7
 
 ## AI, without the hallucinations
 
