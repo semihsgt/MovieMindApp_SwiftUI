@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// A single labelled credit line, e.g. "Director  Denis Villeneuve".
+/// A single labelled credit line, e.g. "Director Denis Villeneuve".
 struct CreditLine: View {
 
     let label: String
@@ -22,6 +22,7 @@ struct CreditLine: View {
                     .foregroundStyle(.white)
             }
             .font(.subheadline)
+            .accessibilityElement(children: .combine)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
         }

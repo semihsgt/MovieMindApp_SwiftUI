@@ -25,6 +25,8 @@ struct GenreChipsRow: View {
                     }
                 }
                 .padding(.horizontal)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Genres: \(names.joined(separator: ", "))")
             }
         }
     }

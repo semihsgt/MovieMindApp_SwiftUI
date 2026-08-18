@@ -12,6 +12,10 @@ struct UpcomingUIModel: Identifiable, Sendable {
     let mediaType: MediaType
     let result: MediaItem
     let genreNames: [String]
+
+    /// This list merges movies and shows, and TMDB hands out ids per media type,
+    /// so `id` alone can collide across the two halves.
+    var uniqueId: String { "\(mediaType.rawValue)-\(id)" }
 }
 
 enum UpcomingUIModelMapper {

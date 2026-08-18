@@ -13,6 +13,9 @@ struct HeroCard: View {
     
     let item: HeroUIModel
     let isButtonDisplayed: Bool
+    /// Spoken after the title. A paged carousel makes VoiceOver walk every control
+    /// on the current page before the next one, so the way across is worth naming.
+    let pagingHint: String
     
     private var mediaType: MediaType? { item.result.mediaType }
     private var posterPath: String? { item.images?.bestPoster ?? item.result.displayPath }
@@ -38,9 +41,10 @@ struct HeroCard: View {
         mediaType == .person || posterPath != item.result.displayPath
     }
 
-    init(item: HeroUIModel, isButtonDisplayed: Bool = true) {
+    init(item: HeroUIModel, isButtonDisplayed: Bool = true, pagingHint: String = "") {
         self.item = item
         self.isButtonDisplayed = isButtonDisplayed
+        self.pagingHint = pagingHint
     }
 
     var body: some View {
@@ -105,24 +109,29 @@ struct HeroCard: View {
         }
     }
 
-    @ViewBuilder
     private var titleView: some View {
-        if let url = TMDBImage.url(for: logoPath, size: .w500) {
-            LazyImage(url: url) { state in
-                if let image = state.image {
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: logoMaxWidth, maxHeight: logoMaxHeight)
-                        .shadow(radius: 10)
-                } else if state.error != nil {
-                    fallbackTitleView
+        Group {
+            if let url = TMDBImage.url(for: logoPath, size: .w500) {
+                LazyImage(url: url) { state in
+                    if let image = state.image {
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: logoMaxWidth, maxHeight: logoMaxHeight)
+                            .shadow(radius: 10)
+                    } else if state.error != nil {
+                        fallbackTitleView
+                    }
                 }
+                .pipeline(.shared)
+            } else {
+                fallbackTitleView
             }
-            .pipeline(.shared)
-        } else {
-            fallbackTitleView
         }
+        // The logo is the title as artwork, so it has to speak the name.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(item.result.displayName)
+        .accessibilityHint(pagingHint)
     }
 
     private var fallbackTitleView: some View {
@@ -171,6 +180,7 @@ struct HeroCard: View {
                 .foregroundStyle(.black)
                 .background(.white, in: .capsule)
             }
+            .accessibilityLabel("More info about \(item.result.displayName)")
 
             LibraryButton(
                 mediaId: item.id,

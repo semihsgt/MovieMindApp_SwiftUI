@@ -11,9 +11,6 @@ import Foundation
 /// model reply with parseable JSON instead of prose.
 indirect enum JSONSchema: Sendable {
     case string
-    case integer
-    case number
-    case boolean
     case array(items: JSONSchema)
     case object(properties: [(String, JSONSchema)], required: [String])
 }
@@ -30,12 +27,6 @@ extension JSONSchema: Encodable {
         switch self {
         case .string:
             try container.encode("STRING", forKey: .type)
-        case .integer:
-            try container.encode("INTEGER", forKey: .type)
-        case .number:
-            try container.encode("NUMBER", forKey: .type)
-        case .boolean:
-            try container.encode("BOOLEAN", forKey: .type)
         case .array(let items):
             try container.encode("ARRAY", forKey: .type)
             try container.encode(items, forKey: .items)

@@ -103,9 +103,9 @@ final class DetailViewModel {
             }
 
             prefetchDetailImages(hero: hero,
-                                       castProfiles: tv.cast,
-                                       seasons: tv.seasons,
-                                       episodeStills: tv.episodeStills)
+                                castProfiles: tv.cast,
+                                seasons: tv.seasons,
+                                episodeStills: tv.episodeStills)
             show(hero)
         } catch {
             state = .failed(error)
@@ -173,16 +173,16 @@ final class DetailViewModel {
     ) {
         prefetcher.prefetch([hero.images?.bestPoster ?? hero.result.displayPath], size: .w780)
         prefetcher.prefetch([hero.images?.bestLogo()], size: .w500)
-
+        
         var thumbnails: [String?] = castProfiles.map(\.profilePath)
         thumbnails += seasons.map(\.posterPath)
         thumbnails += episodeStills
         thumbnails += (watchProviders?.all ?? []).map(\.logoPath)
-
+        
         var posters: [String?] = knownFor.map(\.displayPath)
         posters += (similar?.results ?? []).map(\.displayPath)
         posters.append(collectionBackdrop)
-
+        
         prefetcher.prefetch(thumbnails, size: .w200)
         prefetcher.prefetch(posters, size: .w500)
     }

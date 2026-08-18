@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-/// Placeholder shown while the detail response is in flight.
 struct DetailSkeletonView: View {
 
     var body: some View {
@@ -28,6 +27,8 @@ struct DetailSkeletonView: View {
                 .padding(.top, 24)
                 .padding(.bottom, 40)
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Loading")
         }
         .ignoresSafeArea(edges: .top)
     }

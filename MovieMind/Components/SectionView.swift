@@ -71,12 +71,16 @@ struct SectionView: View {
     private var posterRail: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 10) {
-                ForEach(data) { item in
+                ForEach(Array(data.enumerated()), id: \.element.uniqueId) { index, item in
                     if let route = MediaRoute(item: item, sourceKey: title) {
                         NavigationLink(value: route) {
                             poster(for: item)
                         }
                         .zoomSource(id: route)
+                        .accessibilityRepresentation {
+                            Button(item.accessibilityLabel) {}
+                        }
+                        .accessibilityHint(index == 0 ? AccessibilityHint.horizontalRail : "")
                     }
                 }
             }

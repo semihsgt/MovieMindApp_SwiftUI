@@ -60,8 +60,8 @@ struct HomeView: View {
             VStack(spacing: 0) {
                 FluidHeader {
                     TabView {
-                        ForEach(heroItems) { item in
-                            HeroCard(item: item)
+                        ForEach(heroItems, id: \.uniqueId) { item in
+                            HeroCard(item: item, pagingHint: AccessibilityHint.pagedCarousel)
                         }
                     }
                     .tabViewStyle(.page(indexDisplayMode: .always))

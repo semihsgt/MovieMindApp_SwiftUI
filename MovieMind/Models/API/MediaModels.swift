@@ -87,6 +87,10 @@ struct MediaItem: Decodable, Identifiable, Sendable {
         self.knownFor = knownFor
     }
 
+    /// A movie and a show can share a TMDB id, so any list that mixes types
+    /// needs both halves to tell its rows apart.
+    var uniqueId: String { "\(mediaType?.rawValue ?? "media")-\(id ?? 0)" }
+
     var displayName: String { title ?? name ?? "Untitled" }
     var displayPath: String { posterPath ?? profilePath ?? "" }
     var displayDate: String? { releaseDate ?? firstAirDate }

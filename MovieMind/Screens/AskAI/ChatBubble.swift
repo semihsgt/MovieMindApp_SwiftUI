@@ -21,6 +21,7 @@ struct ChatBubble: View {
                     .padding(.vertical, 10)
                     .background(.red, in: RoundedRectangle(cornerRadius: 18))
                     .foregroundStyle(.white)
+                    .accessibilityLabel("You said: \(message.text)")
             }
 
         case .assistant:
@@ -30,6 +31,7 @@ struct ChatBubble: View {
                     .padding(.vertical, 10)
                     .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 18))
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityLabel("Movie Mind AI said: \(message.text)")
 
                 if !message.items.isEmpty {
                     posterRail
@@ -41,7 +43,7 @@ struct ChatBubble: View {
     private var posterRail: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 10) {
-                ForEach(message.items) { item in
+                ForEach(Array(message.items.enumerated()), id: \.element.uniqueId) { index, item in
                     if let route = MediaRoute(item: item, sourceKey: "ai-\(message.id)") {
                         NavigationLink(value: route) {
                             AsyncPoster(path: item.displayPath,
@@ -50,6 +52,10 @@ struct ChatBubble: View {
                         }
                         .buttonStyle(.plain)
                         .zoomSource(id: route)
+                        .accessibilityRepresentation {
+                            Button(item.accessibilityLabel) {}
+                        }
+                        .accessibilityHint(index == 0 ? AccessibilityHint.horizontalRail : "")
                     }
                 }
             }

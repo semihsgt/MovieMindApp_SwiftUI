@@ -17,6 +17,7 @@ struct AINoticeBanner: View {
                 .foregroundStyle(.yellow)
                 .font(.footnote)
                 .padding(.top, 2)
+                .accessibilityHidden(true)
 
             Text(message)
                 .font(.footnote)
@@ -30,4 +31,8 @@ struct AINoticeBanner: View {
         .padding(.horizontal)
         .padding(.bottom, 40)
     }
+}
+
+#Preview {
+    AINoticeBanner(message: "No Data")
 }

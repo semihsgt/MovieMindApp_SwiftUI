@@ -26,6 +26,9 @@ struct DotSeparatedText: View {
                     .lineLimit(1)
             }
         }
+        // Read as one phrase: the dots are punctuation, not content.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(items.joined(separator: ", "))
     }
 }
 

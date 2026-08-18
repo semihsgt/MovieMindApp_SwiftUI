@@ -31,6 +31,8 @@ struct TypingIndicator: View {
         .padding(.vertical, 12)
         .background(Color(.secondarySystemBackground), in: .capsule)
         .onAppear { isBouncing = true }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Movie Mind AI is typing")
     }
 }
 

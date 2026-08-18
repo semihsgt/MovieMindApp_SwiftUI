@@ -27,7 +27,7 @@ protocol MediaImageServicing: Sendable {
 }
 
 protocol DetailServicing: Sendable {
-    func fetchDetails<T: Decodable>(id: Int, for mediaType: MediaType) async throws -> T
+    func fetchDetails<T: Decodable & Sendable>(id: Int, for mediaType: MediaType) async throws -> T
     func fetchSimilar(id: Int, for mediaType: MediaType) async throws -> ListRespond
     func fetchWatchProviders(id: Int, for mediaType: MediaType) async throws -> WatchProviderResponse
     func fetchPersonCredits(id: Int) async throws -> CombinedCredits

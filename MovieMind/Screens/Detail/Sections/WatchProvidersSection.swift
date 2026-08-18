@@ -39,6 +39,11 @@ struct WatchProvidersSection: View {
                                         size: .w200)
                         }
                     }
+                    .accessibilityRepresentation {
+                        Text(uniqueProviders.map(\.providerName)
+                            .filter { !$0.isEmpty }
+                            .joined(separator: ", "))
+                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

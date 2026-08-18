@@ -12,4 +12,8 @@ struct HeroUIModel: Identifiable, Sendable {
     let result: MediaItem
     var images: Images?
     let genreNames: [String]
+
+    /// The trending carousel mixes movies, shows and people, so `id` alone can
+    /// collide across them.
+    var uniqueId: String { result.uniqueId }
 }

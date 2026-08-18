@@ -51,6 +51,10 @@ struct SeasonsSection: View {
         }
         .foregroundStyle(.white)
         .frame(width: 100)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(season.episodeCount > 0
+                            ? "\(season.displayName), \(season.episodeCount) episodes"
+                            : season.displayName)
     }
 }
 

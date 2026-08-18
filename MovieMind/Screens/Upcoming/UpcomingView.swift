@@ -39,12 +39,17 @@ struct UpcomingView: View {
                 ContentUnavailableView("Nothing Upcoming", systemImage: "popcorn")
                     .padding(.top, 40)
             } else {
-                ForEach(items) { item in
+                ForEach(items, id: \.uniqueId) { item in
                     let route = MediaRoute(id: item.id, mediaType: item.mediaType)
                     NavigationLink(value: route) {
                         UpcomingCard(item: item)
                     }
                     .zoomSource(id: route)
+                    // Art, overlapping text and a chevron in one stack: VoiceOver
+                    // gets a plain button rather than the layout.
+                    .accessibilityRepresentation {
+                        Button(item.accessibilityLabel) {}
+                    }
                 }
             }
         }

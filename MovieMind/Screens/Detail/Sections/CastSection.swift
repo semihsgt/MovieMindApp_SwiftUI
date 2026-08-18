@@ -22,9 +22,10 @@ struct CastSection: View {
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: 10) {
-                        ForEach(cast.prefix(15), id: \.uniqueId) { member in
+                        ForEach(Array(cast.prefix(15).enumerated()), id: \.element.uniqueId) { index, member in
                             if let personId = member.id {
                                 memberCard(member, personId: personId)
+                                    .accessibilityHint(index == 0 ? AccessibilityHint.horizontalRail : "")
                             }
                         }
                     }
@@ -57,6 +58,11 @@ struct CastSection: View {
             .foregroundStyle(.white)
         }
         .zoomSource(id: route)
+        .accessibilityRepresentation {
+            Button(member.character.isEmpty
+                   ? member.name
+                   : "\(member.name) as \(member.character)") {}
+        }
     }
 }
 

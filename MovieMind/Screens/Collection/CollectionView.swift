@@ -27,7 +27,7 @@ struct CollectionView: View {
                     }
 
                     LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(sortedParts(detail)) { item in
+                        ForEach(sortedParts(detail), id: \.uniqueId) { item in
                             if let mediaRoute = MediaRoute(item: item) {
                                 NavigationLink(value: mediaRoute) {
                                     AsyncPoster(path: item.displayPath,
@@ -36,6 +36,9 @@ struct CollectionView: View {
                                 }
                                 .buttonStyle(.plain)
                                 .zoomSource(id: mediaRoute)
+                                .accessibilityRepresentation {
+                                    Button(item.accessibilityLabel) {}
+                                }
                             }
                         }
                     }

@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-/// Placeholder shown while the Home sections are loading.
 struct HomeSkeletonView: View {
 
     var body: some View {
@@ -21,6 +20,8 @@ struct HomeSkeletonView: View {
                     }
                 }
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Loading")
         }
         .ignoresSafeArea(edges: .top)
     }

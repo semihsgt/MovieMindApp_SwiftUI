@@ -53,9 +53,10 @@ struct AsyncPoster: View {
         .onChange(of: path) {
             if failedAttempts != 0 { failedAttempts = 0 }
         }
+        // Decoration: the row or card around the poster is what speaks.
+        .accessibilityHidden(true)
     }
     
-    /// Decodes at the on-screen size rather than the downloaded size.
     private var request: ImageRequest? {
         guard let url = TMDBImage.url(for: path, size: size) else { return nil }
 

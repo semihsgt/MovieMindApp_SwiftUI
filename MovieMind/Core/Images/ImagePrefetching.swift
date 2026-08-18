@@ -17,7 +17,7 @@ final class ImagePrefetching: @unchecked Sendable {
     init() {}
 
     /// Fire and forget: Nuke queues the downloads and returns immediately.
-    func prefetch(_ urls: [URL]) {
+    private func prefetch(_ urls: [URL]) {
         prefetcher.startPrefetching(with: Array(Set(urls)))
     }
 

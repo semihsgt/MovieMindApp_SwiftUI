@@ -69,9 +69,13 @@ enum ListEndpoint: Endpoint {
         Locale.current.region?.identifier ?? "US"
     }
 
+    /// Without a fixed locale the formatter follows the device's calendar, so a
+    /// Buddhist or Japanese one would send a year TMDB can't match and the
+    /// upcoming filter would come back empty.
     private static var todayString: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter.string(from: .now)
     }
 }

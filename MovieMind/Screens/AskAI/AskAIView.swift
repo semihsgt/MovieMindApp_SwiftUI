@@ -34,7 +34,7 @@ struct AskAIView: View {
             inputBar
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .navigationTitle("Ask AI")
+        .navigationTitle("Movie Mind AI")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             let query = initialQuery?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -83,6 +83,7 @@ struct AskAIView: View {
             Image(systemName: "sparkles")
                 .font(.system(size: 40))
                 .foregroundStyle(.red)
+                .accessibilityHidden(true)
 
             Text("Ask Movie Mind AI")
                 .font(.title2.bold())
@@ -130,6 +131,7 @@ struct AskAIView: View {
                     .foregroundStyle(viewModel.canSend ? .red : .gray)
             }
             .disabled(!viewModel.canSend)
+            .accessibilityLabel("Send")
         }
         .padding(.horizontal)
         .padding(.vertical, 10)

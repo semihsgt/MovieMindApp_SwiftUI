@@ -2,6 +2,8 @@
 //  PreviewData.swift
 //  MovieMind
 //
+//  Created by Semih Söğüt on 25.06.2026.
+//
 
 import Foundation
 
@@ -65,8 +67,6 @@ extension HeroUIModel {
         genreNames: ["Acting"]
     )
 }
-
-// MARK: - Detail section samples
 
 extension Season {
     static let preview = Season(id: 1,

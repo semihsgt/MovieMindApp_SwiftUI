@@ -71,6 +71,8 @@ struct LibraryListView: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(item.displayName), \(item.mediaType.spokenName), added \(item.dateAdded.formatted(date: .abbreviated, time: .omitted))")
     }
 
     private func delete(at offsets: IndexSet) {

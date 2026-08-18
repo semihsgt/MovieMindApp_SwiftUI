@@ -14,7 +14,7 @@ struct TabBarView: View {
     
     var body: some View {
         ZStack {
-            TabBarsView
+            SavedLibraryKeysProvider { tabs }
             
             if !isSplashFinished {
                 SplashScreenView()
@@ -28,12 +28,6 @@ struct TabBarView: View {
         }
     }
     
-    private var TabBarsView: some View {
-        SavedLibraryKeysProvider {
-            tabs
-        }
-    }
-
     private var tabs: some View {
         TabView {
             HomeView()

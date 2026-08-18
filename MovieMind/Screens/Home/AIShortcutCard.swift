@@ -18,6 +18,7 @@ struct AIShortcutCard: View {
                     .foregroundStyle(.white)
                     .frame(width: 50, height: 50)
                     .background(.red.gradient, in: RoundedRectangle(cornerRadius: 14))
+                    .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Ask Movie Mind AI")
@@ -36,9 +37,11 @@ struct AIShortcutCard: View {
 
                 Image(systemName: "chevron.right")
                     .foregroundStyle(.white.opacity(0.5))
+                    .accessibilityHidden(true)
             }
             .padding()
             .background(.background.secondary, in: RoundedRectangle(cornerRadius: 20))
+            .accessibilityElement(children: .combine)
         }
         .buttonStyle(.plain)
     }

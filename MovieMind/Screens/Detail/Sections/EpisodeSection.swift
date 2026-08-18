@@ -31,10 +31,26 @@ struct EpisodeSection: View {
 
                     Spacer()
                 }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(label(for: episode))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
         }
+    }
+
+    private func label(for episode: TEpisodeToAir) -> String {
+        var parts: [String] = []
+
+        if episode.hasNumbering {
+            parts.append("Season \(episode.seasonNumber), episode \(episode.episodeNumber)")
+        }
+        parts.append(episode.displayName)
+
+        if let airDate = episode.airDate?.toDate()?.relativeReleaseString() {
+            parts.append(airDate)
+        }
+        return parts.joined(separator: ", ")
     }
 
     private func details(for episode: TEpisodeToAir) -> some View {

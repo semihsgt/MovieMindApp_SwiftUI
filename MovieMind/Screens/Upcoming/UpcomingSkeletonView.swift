@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-/// Placeholder shown while the upcoming lists are loading.
 struct UpcomingSkeletonView: View {
 
     var body: some View {
@@ -16,6 +15,8 @@ struct UpcomingSkeletonView: View {
                 cardSkeleton
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Loading")
     }
 
     private var cardSkeleton: some View {

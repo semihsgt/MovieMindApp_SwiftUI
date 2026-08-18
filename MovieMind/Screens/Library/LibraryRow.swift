@@ -20,6 +20,7 @@ struct LibraryRow: View {
                     .scaledToFit()
                     .frame(width: 30, height: 30)
                     .foregroundStyle(iconColor)
+                    .accessibilityHidden(true)
 
                 Text(route.title)
                     .font(.body)

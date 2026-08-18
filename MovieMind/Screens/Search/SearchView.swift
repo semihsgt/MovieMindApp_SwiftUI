@@ -81,13 +81,16 @@ struct SearchView: View {
                     askAIRow
                 }
 
-                ForEach(items) { item in
+                ForEach(items, id: \.uniqueId) { item in
                     if let route = MediaRoute(item: item) {
                         NavigationLink(value: route) {
                             SearchRowView(item: item)
                         }
                         .buttonStyle(.plain)
                         .zoomSource(id: route)
+                        .accessibilityRepresentation {
+                            Button(item.accessibilityLabel) {}
+                        }
                         .task { await viewModel.loadMoreIfNeeded(currentItem: item) }
                     }
                 }
@@ -128,6 +131,8 @@ struct SearchView: View {
             }
             .padding(8)
             .background(Color(.secondarySystemBackground).opacity(0.5), in: RoundedRectangle(cornerRadius: 16))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Ask AI for recommendations for \(trimmedQuery)")
         }
         .buttonStyle(.plain)
     }

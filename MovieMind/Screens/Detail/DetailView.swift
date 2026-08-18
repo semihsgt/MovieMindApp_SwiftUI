@@ -99,6 +99,9 @@ struct DetailView: View {
             }
             .buttonStyle(.plain)
             .zoomSource(id: route)
+            .accessibilityRepresentation {
+                Button("Part of \(collection.displayName)") {}
+            }
         }
     }
 

@@ -78,6 +78,9 @@ struct LibraryView: View {
                     }
                     .buttonStyle(.plain)
                     .zoomSource(id: route)
+                    .accessibilityRepresentation {
+                        Button("\(item.displayName), \(item.mediaType.spokenName)") {}
+                    }
                 }
             }
             .padding(.horizontal)

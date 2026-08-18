@@ -12,10 +12,21 @@
 		4E00000000000000000A002 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4E00000000000000000A004 /* NukeUI */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		375AF8013034998400B42C55 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3791FC492FEC5DE50005CBA4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3753F67F2FFC9DB700DC7E17;
+			remoteInfo = MovieMind;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		37158BAF2FFBF85E00E98FCA /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3753F5E52FFC255700DC7E17 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3753F6802FFC9DB700DC7E17 /* MovieMind.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MovieMind.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		375AF7FD3034998400B42C55 /* MovieMindTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MovieMindTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -31,9 +42,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		37158BBD2FFBFEDE00E98FCA /* Screenshots */ = {
+		374CD318302F34BC00D17FD6 /* Media */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Screenshots;
+			path = Media;
+			sourceTree = "<group>";
+		};
+		375AF7FE3034998400B42C55 /* MovieMindTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MovieMindTests;
 			sourceTree = "<group>";
 		};
 		37AFAD20300D17EA00DE6B31 /* MovieMind */ = {
@@ -57,6 +73,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		375AF7FA3034998400B42C55 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -66,7 +89,9 @@
 				37158BAF2FFBF85E00E98FCA /* README.md */,
 				3753F5E52FFC255700DC7E17 /* .gitignore */,
 				3753F6802FFC9DB700DC7E17 /* MovieMind.app */,
-				37158BBD2FFBFEDE00E98FCA /* Screenshots */,
+				375AF7FD3034998400B42C55 /* MovieMindTests.xctest */,
+				374CD318302F34BC00D17FD6 /* Media */,
+				375AF7FE3034998400B42C55 /* MovieMindTests */,
 				37AFAD20300D17EA00DE6B31 /* MovieMind */,
 			);
 			sourceTree = "<group>";
@@ -99,6 +124,29 @@
 			productReference = 3753F6802FFC9DB700DC7E17 /* MovieMind.app */;
 			productType = "com.apple.product-type.application";
 		};
+		375AF7FC3034998400B42C55 /* MovieMindTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 375AF8033034998400B42C55 /* Build configuration list for PBXNativeTarget "MovieMindTests" */;
+			buildPhases = (
+				375AF7F93034998400B42C55 /* Sources */,
+				375AF7FA3034998400B42C55 /* Frameworks */,
+				375AF7FB3034998400B42C55 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				375AF8023034998400B42C55 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				375AF7FE3034998400B42C55 /* MovieMindTests */,
+			);
+			name = MovieMindTests;
+			packageProductDependencies = (
+			);
+			productName = MovieMindTests;
+			productReference = 375AF7FD3034998400B42C55 /* MovieMindTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -111,6 +159,11 @@
 				TargetAttributes = {
 					3753F67F2FFC9DB700DC7E17 = {
 						CreatedOnToolsVersion = 26.6;
+					};
+					375AF7FC3034998400B42C55 = {
+						CreatedOnToolsVersion = 26.6;
+						LastSwiftMigration = 2660;
+						TestTargetID = 3753F67F2FFC9DB700DC7E17;
 					};
 				};
 			};
@@ -133,12 +186,20 @@
 			projectRoot = "";
 			targets = (
 				3753F67F2FFC9DB700DC7E17 /* MovieMind */,
+				375AF7FC3034998400B42C55 /* MovieMindTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		3753F67E2FFC9DB700DC7E17 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		375AF7FB3034998400B42C55 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -155,7 +216,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		375AF7F93034998400B42C55 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		375AF8023034998400B42C55 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3753F67F2FFC9DB700DC7E17 /* MovieMind */;
+			targetProxy = 375AF8013034998400B42C55 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3753F6892FFC9DB800DC7E17 /* Debug */ = {
@@ -243,6 +319,53 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		375AF8043034998400B42C55 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9Y9BPF9633;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SemihSogut.MovieMindTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MovieMind.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MovieMind";
+			};
+			name = Debug;
+		};
+		375AF8053034998400B42C55 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9Y9BPF9633;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SemihSogut.MovieMindTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MovieMind.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MovieMind";
 			};
 			name = Release;
 		};
@@ -381,6 +504,15 @@
 			buildConfigurations = (
 				3753F6892FFC9DB800DC7E17 /* Debug */,
 				3753F68A2FFC9DB800DC7E17 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		375AF8033034998400B42C55 /* Build configuration list for PBXNativeTarget "MovieMindTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				375AF8043034998400B42C55 /* Debug */,
+				375AF8053034998400B42C55 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
