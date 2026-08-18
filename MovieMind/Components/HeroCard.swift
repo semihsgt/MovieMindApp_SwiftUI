@@ -6,41 +6,47 @@
 //
 
 import SwiftUI
+import Nuke
+import NukeUI
 
 struct HeroCard: View {
+    
     let item: HeroUIModel
     let isButtonDisplayed: Bool
+    /// Spoken after the title. A paged carousel makes VoiceOver walk every control
+    /// on the current page before the next one, so the way across is worth naming.
+    let pagingHint: String
     
-    init(item: HeroUIModel, isButtonDisplayed: Bool = true) {
-        self.item = item
-        self.isButtonDisplayed = isButtonDisplayed
-    }
+    private var mediaType: MediaType? { item.result.mediaType }
+    private var posterPath: String? { item.images?.bestPoster ?? item.result.displayPath }
+    private var logoPath: String? { item.images?.bestLogo() }
     
-    private var mediaType: MediaType? {
-        item.result.mediaType
-    }
-    
-    private var posterPath: String? {
-        item.images?.bestPoster ?? item.result.displayPath
-    }
-    
-    private var logoPath: String? {
-        item.images?.bestLogo()
-    }
-
-    private var shouldShowTitle: Bool {
-        mediaType == .person || posterPath != item.result.displayPath
-    }
+    private var logoMaxWidth: CGFloat { isButtonDisplayed ? 260 : 350 }
+    private var logoMaxHeight: CGFloat { isButtonDisplayed ? 90 : 120 }
     
     private var mediaTypeLabel: String {
         switch mediaType {
-        case .person: return "Person"
-        case .tv: return "TV"
-        case .movie: return "Movie"
-        case .none: return ""
+        case .person: "Person"
+        case .tv: "TV"
+        case .movie: "Movie"
+        case .none: ""
         }
     }
     
+    /// TMDB's default poster usually has the title printed on the artwork, while the
+    /// language-neutral one does not. Drawing the logo over the former would show the
+    /// name twice, so it is only drawn when a textless poster was found — or for
+    /// people, whose photos never carry a name.
+    private var shouldShowTitle: Bool {
+        mediaType == .person || posterPath != item.result.displayPath
+    }
+
+    init(item: HeroUIModel, isButtonDisplayed: Bool = true, pagingHint: String = "") {
+        self.item = item
+        self.isButtonDisplayed = isButtonDisplayed
+        self.pagingHint = pagingHint
+    }
+
     var body: some View {
         ZStack {
             LinearGradient(
@@ -55,81 +61,79 @@ struct HeroCard: View {
                 startPoint: .top,
                 endPoint: .bottom
             )
-            
+
             if isButtonDisplayed {
+                
                 VStack(spacing: 0) {
                     Spacer()
-                    
+
                     if shouldShowTitle {
                         titleView
                             .padding(.bottom, 8)
                     }
-                    
+
                     subtitleView
                         .shadow(radius: 10)
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.9))
                         .padding(.bottom, 20)
-                    
+
                     actionButtonsView
                         .shadow(radius: 10)
                         .padding(.bottom, 20)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 30)
-            } else {
-                if shouldShowTitle {
-                    VStack(spacing: 0) {
-                        Spacer()
-                        titleView
-                            .padding(.vertical)
-                    }
+                
+            } else if shouldShowTitle {
+                
+                VStack(spacing: 0) {
+                    Spacer()
+                    titleView
+                        .padding(.vertical)
                 }
+                
             }
         }
         .aspectRatio(2/3, contentMode: .fit)
-        .background {
-            backgroundImageView
-        }
+        .background { backgroundImageView }
         .clipped()
     }
-    
+
     @ViewBuilder
     private var backgroundImageView: some View {
-        if let path = posterPath {
-            AsyncPoster(path: path, contentMode: .fill, cornerRadius: 0, size: .w780)
+        if let posterPath, !posterPath.isEmpty {
+            AsyncPoster(path: posterPath, contentMode: .fill, cornerRadius: 0, size: .w780)
         } else {
-            Rectangle()
-                .fill(Color.black.opacity(0.8))
+            Rectangle().fill(Color.black.opacity(0.8))
         }
     }
-    
-    
-    @ViewBuilder
+
     private var titleView: some View {
-        if let url = TMDBImage.url(for: logoPath, size: .w500) {
-            AsyncImage(url: url) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: isButtonDisplayed ? 260 : 350,
-                               maxHeight: isButtonDisplayed ? 90 : 120)
-                        .shadow(radius: 10)
-                case .empty:
-                    EmptyView()
-                case .failure:
-                    fallbackTitleView
-                @unknown default:
-                    fallbackTitleView
+        Group {
+            if let url = TMDBImage.url(for: logoPath, size: .w500) {
+                LazyImage(url: url) { state in
+                    if let image = state.image {
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: logoMaxWidth, maxHeight: logoMaxHeight)
+                            .shadow(radius: 10)
+                    } else if state.error != nil {
+                        fallbackTitleView
+                    }
                 }
+                .pipeline(.shared)
+            } else {
+                fallbackTitleView
             }
-        } else {
-            fallbackTitleView
         }
+        // The logo is the title as artwork, so it has to speak the name.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(item.result.displayName)
+        .accessibilityHint(pagingHint)
     }
-    
+
     private var fallbackTitleView: some View {
         Text(item.result.displayName)
             .font(.system(size: 32, weight: .heavy, design: .rounded))
@@ -139,54 +143,34 @@ struct HeroCard: View {
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 25)
     }
-    
-    @ViewBuilder
+
     private var subtitleView: some View {
+        DotSeparatedText(items: subtitleItems)
+    }
+
+    /// People read "Person • Acting • Known for …", titles read
+    /// "Movie • Drama • Thriller • 18+".
+    private var subtitleItems: [String] {
         switch mediaType {
         case .person:
-            HStack(spacing: 6) {
-                Text(mediaTypeLabel)
-                
-                if let department = item.result.knownForDepartment {
-                    Text("•")
-                    Text(department)
-                }
-                
-                if let topKnown = item.result.knownFor?.first {
-                    let topTitle = topKnown.title ?? topKnown.name ?? ""
-                    if !topTitle.isEmpty {
-                        Text("•")
-                        Text("Known for \(topTitle)")
-                            .lineLimit(1)
-                    }
-                }
-            }
-            
-        case .tv, .movie:
-            HStack(spacing: 6) {
-                Text(mediaTypeLabel)
-                
-                ForEach(Array(item.genreNames.prefix(2)), id: \.self) { genreName in
-                    Text("•")
-                    Text(genreName)
-                }
-                
-                if item.result.adult == true {
-                    Text("•")
-                    Text("18+")
-                        .foregroundStyle(.red)
-                        .fontWeight(.bold)
-                }
-            }
-            
+            let known = item.result.knownFor.first?.displayName ?? ""
+            return [mediaTypeLabel,
+                    item.result.knownForDepartment,
+                    known.isEmpty ? nil : "Known for \(known)"].compactMap { $0 }
+
+        case .movie, .tv:
+            return [mediaTypeLabel]
+                + Array(item.genreNames.prefix(2))
+                + (item.result.adult ? ["18+"] : [])
+
         case .none:
-            EmptyView()
+            return []
         }
     }
-    
+
     private var actionButtonsView: some View {
         HStack(spacing: 12) {
-            NavigationLink(value: MediaRoute(id: item.id, mediaType: item.result.mediaType ?? .movie)) {
+            NavigationLink(value: MediaRoute(id: item.id, mediaType: mediaType ?? .movie)) {
                 HStack {
                     Image(systemName: "info.circle")
                     Text("More Info")
@@ -196,10 +180,11 @@ struct HeroCard: View {
                 .foregroundStyle(.black)
                 .background(.white, in: .capsule)
             }
-            
-            WatchlistButton(
+            .accessibilityLabel("More info about \(item.result.displayName)")
+
+            LibraryButton(
                 mediaId: item.id,
-                mediaType: item.result.mediaType ?? .movie,
+                mediaType: mediaType ?? .movie,
                 displayName: item.result.displayName,
                 posterPath: item.result.displayPath,
                 showsBackground: true
@@ -209,7 +194,7 @@ struct HeroCard: View {
 }
 
 #Preview("Home Page") {
-    HomePageView()
+    HomeView()
 }
 
 #Preview("Hero Cards") {

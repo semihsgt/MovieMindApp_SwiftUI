@@ -35,7 +35,7 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37F160372FFBF04900B626DF"
+               BlueprintIdentifier = "375AF7FC3034998400B42C55"
                BuildableName = "MovieMindTests.xctest"
                BlueprintName = "MovieMindTests"
                ReferencedContainer = "container:MovieMind.xcodeproj">

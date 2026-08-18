@@ -7,15 +7,17 @@
 
 import SwiftUI
 
+/// The shared failure screen: what went wrong plus a button that re-runs the load.
 struct ErrorRetryView: View {
-    let message: String
+    
+    let error: Error
     let retryAction: () async -> Void
 
     var body: some View {
         ContentUnavailableView {
             Label("Something Went Wrong", systemImage: "wifi.exclamationmark")
         } description: {
-            Text(message)
+            Text(error.localizedDescription)
         } actions: {
             Button("Try Again") {
                 Task { await retryAction() }
@@ -25,6 +27,9 @@ struct ErrorRetryView: View {
     }
 }
 
+/// Renders a `ViewState` so screens never branch on it themselves: the caller
+/// supplies a skeleton and the loaded content, and gets the idle, loading and
+/// failure cases handled the same way everywhere.
 struct StateContainerView<Value, Loading: View, Content: View>: View {
     let state: ViewState<Value>
     let retryAction: () async -> Void
@@ -37,8 +42,8 @@ struct StateContainerView<Value, Loading: View, Content: View>: View {
             loading()
                 .transition(.opacity)
 
-        case .failed(let message):
-            ErrorRetryView(message: message, retryAction: retryAction)
+        case .failed(let error):
+            ErrorRetryView(error: error, retryAction: retryAction)
                 .containerRelativeFrame(.vertical)
 
         case .loaded(let value):
@@ -73,7 +78,7 @@ struct DefaultLoadingView: View {
 }
 
 #Preview("Failed") {
-    StateContainerView(state: ViewState<[String]>.failed("The Internet connection appears to be offline."), retryAction: {}) { _ in
+    StateContainerView(state: ViewState<[String]>.failed(NetworkError.invalidResponse), retryAction: {}) { _ in
         Text("Content")
     }
 }
@@ -81,17 +86,5 @@ struct DefaultLoadingView: View {
 #Preview("Loaded") {
     StateContainerView(state: .loaded(["Dune", "The Last of Us"]), retryAction: {}) { items in
         List(items, id: \.self) { Text($0) }
-    }
-}
-
-#Preview("Custom Skeleton") {
-    StateContainerView(state: ViewState<[String]>.loading) {
-    } loading: {
-        RoundedRectangle(cornerRadius: 16)
-            .fill(Color.white.opacity(0.08))
-            .frame(width: 200, height: 300)
-            .shimmer()
-    } content: { _ in
-        Text("Content")
     }
 }
