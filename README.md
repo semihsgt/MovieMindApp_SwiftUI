@@ -90,6 +90,56 @@ MovieMind
 
 - ***SwiftData:*** The library keeps an id, a type and just enough to draw a row: title and poster path. That copy is what lets the Library tab render offline without one request per row, at the cost of going stale if TMDB renames a title. Detail pages always refetch.
 
+## A closer look: @Fallback
+
+TMDB leaves fields out constantly and inconsistently. Decoded straight into Swift that makes nearly every property optional, and the views pay for it with an if let on every title, runtime and rating.
+
+A missing title is not unknown though, it is empty. @Fallback turns all three cases into that empty form: an absent key, an explicit null, or the wrong type such as "142" instead of 142.
+
+The absent key is the interesting one. Decodable throws keyNotFound before the wrapper is ever built, so init(from:) never runs. An overload of KeyedDecodingContainer.decode routes it through decodeIfPresent instead:
+
+```swift
+@propertyWrapper
+struct Fallback<Value: Decodable & Sendable & EmptyRepresentable>: Decodable, Sendable {
+
+    var wrappedValue: Value
+
+    init(wrappedValue: Value = Value()) {
+        self.wrappedValue = wrappedValue
+    }
+
+    /// A null, or the wrong type entirely.
+    init(from decoder: Decoder) throws {
+        wrappedValue = (try? Value(from: decoder)) ?? Value()
+    }
+}
+
+/// A key that isn't in the payload at all: without this overload the synthesized
+/// decoder throws `keyNotFound` before `Fallback.init(from:)` ever runs.
+extension KeyedDecodingContainer {
+
+    func decode<Value>(_ type: Fallback<Value>.Type,
+                       forKey key: Key) throws -> Fallback<Value> {
+        try decodeIfPresent(type, forKey: key) ?? Fallback()
+    }
+}
+```
+
+The models then say what they mean, and the views stop unwrapping:
+
+```swift
+struct MovieDetail: Decodable, Identifiable, Sendable {
+    let id: Int?
+    @Fallback var title: String = ""
+    @Fallback var runtime: Int = 0
+    @Fallback var genres: [Genre] = []
+    let posterPath: String?      // absence changes the UI, so it stays optional
+    let releaseDate: String?
+}
+```
+
+60 of the 107 decoded properties are wrapped this way. The 47 that are still optional are the ones where absence genuinely changes what gets drawn.
+
 ## Tech Stack
 
 ### Built with
